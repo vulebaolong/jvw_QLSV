@@ -134,7 +134,7 @@ public class UserDAO {
     // Lấy danh sách tất cả người dùng
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM Users";
+        String sql = "SELECT * FROM Users ORDER BY createdAt DESC";
         try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -200,6 +200,30 @@ public class UserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public User getUserById(int id) {
+        String sql = "SELECT * FROM Users WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new User(
+                       rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("role"),
+                        rs.getObject("studentId") != null ? rs.getInt("studentId") : null,
+                        rs.getTimestamp("createdAt"),
+                        rs.getTimestamp("updatedAt")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // Xóa người dùng

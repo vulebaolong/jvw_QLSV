@@ -24,8 +24,10 @@ CREATE TABLE `Students` (
     `gender` ENUM('Male', 'Female', 'Other') NOT NULL, -- Giới tính (Nam, Nữ, Khác).
     `phone` VARCHAR(255), -- Số điện thoại (không trùng lặp).
     `address` TEXT, --  Địa chỉ sinh viên.
+    `classId` INT, 
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-	`updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	`updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (`classId`) REFERENCES `Classes`(id) ON DELETE CASCADE
 );
 
 -- Đăng ký môn học

@@ -16,12 +16,11 @@ import java.util.List;
  * @author vulebaolong
  */
 public class SubjectsDAO {
-    
+
     // Thêm môn học
     public boolean addSubject(Subject subject) {
         String sql = "INSERT INTO Subjects (subjectName, credit) VALUES (?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, subject.getSubjectName());
             stmt.setInt(2, subject.getCredit());
@@ -36,10 +35,8 @@ public class SubjectsDAO {
     // Lấy danh sách tất cả môn học
     public List<Subject> getAllSubjects() {
         List<Subject> subjects = new ArrayList<>();
-        String sql = "SELECT * FROM Subjects";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        String sql = "SELECT * FROM Subjects ORDER BY createdAt DESC";
+        try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Subject subject = new Subject(
@@ -58,8 +55,7 @@ public class SubjectsDAO {
     // Cập nhật thông tin môn học
     public boolean updateSubject(Subject subject) {
         String sql = "UPDATE Subjects SET subjectName=?, credit=? WHERE id=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, subject.getSubjectName());
             stmt.setInt(2, subject.getCredit());
@@ -72,11 +68,32 @@ public class SubjectsDAO {
         }
     }
 
+    public Subject getSubjectById(int id) {
+        String sql = "SELECT * FROM Subjects WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Subject(
+                        rs.getInt("id"),
+                        rs.getString("subjectName"),
+                        rs.getInt("credit"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getTimestamp("updatedAt")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // Xóa môn học
     public boolean deleteSubject(int subjectId) {
         String sql = "DELETE FROM Subjects WHERE id=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, subjectId);
             return stmt.executeUpdate() > 0;

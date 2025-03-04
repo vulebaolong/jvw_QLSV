@@ -39,7 +39,7 @@ public class EnrollmentsDAO {
     // Lấy danh sách tất cả đăng ký môn học
     public List<Enrollment> getAllEnrollments() {
         List<Enrollment> enrollments = new ArrayList<>();
-        String sql = "SELECT * FROM Enrollments";
+        String sql = "SELECT * FROM Enrollments ORDER BY createdAt DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

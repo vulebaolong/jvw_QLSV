@@ -5,6 +5,8 @@
 package view;
 
 import java.awt.CardLayout;
+import model.User;
+import session.UserSession;
 
 /**
  *
@@ -35,18 +37,22 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        mainPanel.setPreferredSize(new java.awt.Dimension(500, 500));
+        mainPanel.setAlignmentX(0.0F);
+        mainPanel.setAlignmentY(0.0F);
         mainPanel.setLayout(new java.awt.CardLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(0, 1, Short.MAX_VALUE)
+                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 498, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 1, Short.MAX_VALUE))
         );
 
         pack();
@@ -104,9 +110,26 @@ public class MainFrame extends javax.swing.JFrame {
         mainPanel.add(adminPanel, "Admin");
         mainPanel.add(teacherPanel, "Teacher");
         mainPanel.add(studentPanel, "Student");
+        
+        UserSession.printAllPreferences();
 
-        // Hiển thị màn hình Đăng ký trước
-        cardLayout.show(mainPanel, "Login");
+        User curentUser = UserSession.checkWhenOpenApp();
+
+        if (curentUser != null) {
+            switch (curentUser.getRole()) {
+                case "Admin":
+                    cardLayout.show(mainPanel, "Admin");
+                    break;
+                case "Teacher":
+                    cardLayout.show(mainPanel, "Teacher");
+                    break;
+                default:
+                    cardLayout.show(mainPanel, "Student");
+                    break;
+            }
+        } else {
+            cardLayout.show(mainPanel, "Login");
+        }
 
         // Căn giữa cửa sổ
         pack();

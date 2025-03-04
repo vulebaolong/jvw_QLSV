@@ -4,6 +4,8 @@
  */
 package model;
 
+import java.sql.Timestamp;
+
 /**
  *
  * @author vulebaolong
@@ -13,11 +15,26 @@ public class Subject {
     private int id;
     private String subjectName;
     private int credit;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Subject(int id, String subjectName, int credit) {
         this.id = id;
         this.subjectName = subjectName;
         this.credit = credit;
+    }
+    
+     public Subject(String subjectName, int credit) {
+        this.subjectName = subjectName;
+        this.credit = credit;
+    }
+
+    public Subject(int id, String subjectName, int credit, Timestamp createdAt, Timestamp updatedAt) {
+        this.id = id;
+        this.subjectName = subjectName;
+        this.credit = credit;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
@@ -43,5 +60,21 @@ public class Subject {
 
     public void setCredit(int credit) {
         this.credit = credit;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

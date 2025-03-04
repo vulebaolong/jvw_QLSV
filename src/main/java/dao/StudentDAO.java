@@ -19,7 +19,7 @@ public class StudentDAO {
 
     // Thêm sinh viên
     public boolean addStudent(Student student) {
-        String sql = "INSERT INTO Students (fullName, birthDay, gender, email, phone, address) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Students (fullName, birthDay, gender, phone, address) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, student.getFullName());
@@ -38,7 +38,7 @@ public class StudentDAO {
     // Lấy danh sách sinh viên
     public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
-        String sql = "SELECT * FROM Students";
+        String sql = "SELECT * FROM Students ORDER BY createdAt DESC";
         try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -49,6 +49,7 @@ public class StudentDAO {
                         rs.getString("gender"),
                         rs.getString("phone"),
                         rs.getString("address"),
+                        rs.getInt("classId"),
                         rs.getTimestamp("createdAt"),
                         rs.getTimestamp("updatedAt")
                 );
@@ -97,6 +98,7 @@ public class StudentDAO {
                         rs.getString("gender"),
                         rs.getString("phone"),
                         rs.getString("address"),
+                        rs.getInt("classId"),
                         rs.getTimestamp("createdAt"),
                         rs.getTimestamp("updatedAt")
                 );
@@ -119,4 +121,19 @@ public class StudentDAO {
             return false;
         }
     }
+
+    public boolean updateStudentClass(int studentId, int classId) {
+        String sql = "UPDATE Students SET classId = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, classId);
+            stmt.setInt(2, studentId);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

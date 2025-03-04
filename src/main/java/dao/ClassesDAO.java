@@ -16,6 +16,7 @@ import java.util.List;
  * @author vulebaolong
  */
 public class ClassesDAO {
+
     // Thêm lớp học vào database (không cần ID)
     public boolean addClass(Classes cls) {
         String sql = "INSERT INTO Classes (className, department) VALUES (?, ?)";
@@ -34,7 +35,7 @@ public class ClassesDAO {
     // Lấy danh sách tất cả lớp học
     public List<Classes> getAllClasses() {
         List<Classes> classes = new ArrayList<>();
-        String sql = "SELECT * FROM Classes";
+        String sql = "SELECT * FROM Classes ORDER BY createdAt DESC";
         try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -49,6 +50,46 @@ public class ClassesDAO {
             e.printStackTrace();
         }
         return classes;
+    }
+
+    public Classes getClassById(int id) {
+        String sql = "SELECT * FROM Classes WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Classes(
+                        rs.getInt("id"),
+                        rs.getString("className"),
+                        rs.getString("department"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getTimestamp("updatedAt")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public boolean updateClasses(Classes classes) {
+        String sql = "UPDATE Classes SET className=?, department=? WHERE id=?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, classes.getClassName());
+            stmt.setString(2, classes.getDepartment());
+            stmt.setInt(3, classes.getId());
+
+            System.err.println(stmt);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi cập nhật lớp học! ID: " + classes.getId());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // Cập nhật thông tin lớp theo ID

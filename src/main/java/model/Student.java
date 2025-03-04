@@ -19,22 +19,24 @@ public class Student {
     private String gender;
     private String phone;
     private String address;
+    private int classId;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    public Student(int id, String fullName, Date birthDay, String gender, String phone, String address, Timestamp createdAt, Timestamp updatedAt) {
+    public Student(int id, String fullName, Date birthDay, String gender, String phone, String address, int classId, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.fullName = fullName;
         this.birthDay = birthDay;
         this.gender = gender;
         this.phone = phone;
         this.address = address;
+        this.classId = classId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     public Student(int id, String fullName, Date birthDay, String gender, String phone, String address) {
-        this.id = id;        
+        this.id = id;
         this.fullName = fullName;
         this.birthDay = birthDay;
         this.gender = gender;
@@ -48,6 +50,16 @@ public class Student {
         this.gender = gender;
         this.phone = phone;
         this.address = address;
+    }
+
+    public Student(int id, String fullName, Date birthDay, String gender, String phone, String address, int classId) {
+        this.id = id;
+        this.fullName = fullName;
+        this.birthDay = birthDay;
+        this.gender = gender;
+        this.phone = phone;
+        this.address = address;
+        this.classId = classId;
     }
 
     public int getId() {
@@ -105,13 +117,21 @@ public class Student {
     public void setAddress(String address) {
         this.address = address;
     }
-    
+
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void setClassId(int classId) {
+        this.classId = classId;
+    }
+
+    public int getClassId() {
+        return classId;
     }
 
 }
