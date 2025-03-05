@@ -18,13 +18,15 @@ public class User {
     private String role;
     private Integer studentId;
     private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private Timestamp updatedAt;    
+    private Student student;
+
 
     public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
-    
+
     public User(int id, String email, String password, String role, Integer studentId, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.email = email;
@@ -33,6 +35,25 @@ public class User {
         this.studentId = studentId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public User(int userId, String email, String password, String role, Integer studentId, Timestamp createdAt, Timestamp updatedAt, Student student) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.studentId = studentId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.student = student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    public Student getStudent() {
+        return student;
     }
 
     public int getId() {
@@ -90,6 +111,5 @@ public class User {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
 
 }

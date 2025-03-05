@@ -4,9 +4,9 @@
  */
 package view;
 
+import components.Toast;
 import dao.UserDAO;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -43,6 +43,7 @@ public class RegisterPanel extends javax.swing.JPanel {
         lbPassword = new javax.swing.JLabel();
         txtPassword = new javax.swing.JPasswordField();
         btnRegister = new javax.swing.JButton();
+        lbGobackLogin = new javax.swing.JLabel();
 
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         jLabel1.setText("REGISTER");
@@ -58,16 +59,23 @@ public class RegisterPanel extends javax.swing.JPanel {
             }
         });
 
+        lbGobackLogin.setText("Go back login");
+        lbGobackLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbGobackLoginMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(198, 198, 198)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(100, 100, 100)
+                .addGap(350, 350, 350)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnRegister, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -78,14 +86,18 @@ public class RegisterPanel extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                             .addComponent(txtEmail))))
-                .addGap(100, 100, 100))
+                .addGap(350, 350, 350))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbGobackLogin)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addGap(108, 108, 108)
                 .addComponent(jLabel1)
-                .addGap(77, 77, 77)
+                .addGap(53, 53, 53)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lbEmail)
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -93,9 +105,11 @@ public class RegisterPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lbPassword)
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(55, 55, 55)
+                .addGap(30, 30, 30)
                 .addComponent(btnRegister)
-                .addContainerGap(216, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(lbGobackLogin)
+                .addContainerGap(218, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -104,13 +118,13 @@ public class RegisterPanel extends javax.swing.JPanel {
         String password = new String(txtPassword.getPassword()).trim();
 
         if (email.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Email không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Email không được để trống!");
             txtEmail.requestFocus();
             return;
         }
 
         if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Mật khẩu không được để trống!");
             txtPassword.requestFocus();
             return;
         }
@@ -119,10 +133,10 @@ public class RegisterPanel extends javax.swing.JPanel {
         System.out.println("password: " + password);
 
         User userExists = userDao.getUserByEmail(email);
-        
-        if(userExists != null) {
-            JOptionPane.showMessageDialog(this, String.format("Email: %s đã tồn tại", email), "Lỗi", JOptionPane.ERROR_MESSAGE);
-            txtEmail.requestFocus();            
+
+        if (userExists != null) {
+            Toast.show("❌ Email đã tồn tại!");
+            txtEmail.requestFocus();
             return;
         }
 
@@ -130,23 +144,25 @@ public class RegisterPanel extends javax.swing.JPanel {
 
         boolean success = userDao.addUser(user);
         if (success) {
-            // Hiển thị thông báo đăng ký thành công
-            String text1 = "Đăng ký thành công";
-            JOptionPane.showMessageDialog(this, String.format("Email: %s\n%s", email, text1), "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            Toast.show("✅ Đăng ký thành công!");
             txtEmail.setText("");
             txtPassword.setText("");
-            // Chuyển sang giao diện Đăng nhập
-            ((MainFrame) SwingUtilities.getWindowAncestor(this)).showPanel("Login");
+            mainFrame.showPanelAuth("Login");
         } else {
             JOptionPane.showMessageDialog(this, "Đăng ký không thành công");
         }
     }//GEN-LAST:event_btnRegisterActionPerformed
+
+    private void lbGobackLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbGobackLoginMouseClicked
+        mainFrame.showPanelAuth("Login");
+    }//GEN-LAST:event_lbGobackLoginMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegister;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lbEmail;
+    private javax.swing.JLabel lbGobackLogin;
     private javax.swing.JLabel lbPassword;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JPasswordField txtPassword;

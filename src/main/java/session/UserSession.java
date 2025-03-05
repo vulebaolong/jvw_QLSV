@@ -4,6 +4,7 @@ import java.util.prefs.Preferences;
 import dao.UserDAO;
 import java.util.prefs.BackingStoreException;
 import model.User;
+import view.MainFrame;
 
 public class UserSession {
 
@@ -29,19 +30,23 @@ public class UserSession {
         prefs.remove("userId");
     }
 
-    public static User checkWhenOpenApp() {
-        if (UserSession.isLoggedIn()) { // Kiểm tra nếu đã đăng nhập
+    public static User getInfo() {
+        if (UserSession.isLoggedIn()) { 
             UserDAO userDAO = new UserDAO();
             int userId = UserSession.getUserId();
-            User currentUser = userDAO.getUserById(userId); // Lấy thông tin từ DB
+            User currentUser = userDAO.getUserById(userId);
+            
 
             if (currentUser != null) {
                 System.out.println("Người dùng đã đăng nhập");
                 System.out.println("Email: " + currentUser.getEmail());
-                System.out.println("Role: " + currentUser.getRole());
+                System.out.println("Role: " + currentUser.getRole());                
+                System.out.println("student: " + currentUser.getStudent());                
+
+
                 return currentUser;
             } else {
-                UserSession.logout(); // Nếu userId không hợp lệ, đăng xuất
+                UserSession.logout();
                 return null;
             }
         } else {

@@ -4,6 +4,7 @@ import components.ActionButtonColumn;
 import view.dialog.AddStudentDialog;
 import view.dialog.ChangeClassDialog;
 import components.DeleteButtonColumn;
+import components.Toast;
 import dao.StudentDAO;
 import dao.ClassesDAO;
 import dao.SubjectsDAO;
@@ -14,7 +15,6 @@ import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import java.sql.Date;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import view.dialog.AddClassDialog;
 import view.dialog.AddSubjectDialog;
@@ -47,7 +47,6 @@ public class AdminPanel extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tbListStudent.getModel();
         model.setRowCount(0);
 
-        // Thêm từng sinh viên vào bảng
         for (Student s : students) {
             model.addRow(new Object[]{
                 s.getId(),
@@ -68,9 +67,8 @@ public class AdminPanel extends javax.swing.JPanel {
         List<Classes> classes = classesDAO.getAllClasses();
 
         DefaultTableModel model = (DefaultTableModel) tableListClass.getModel();
-        model.setRowCount(0); // Xóa dữ liệu cũ
+        model.setRowCount(0);
 
-        // Thêm từng class vào bảng
         for (Classes s : classes) {
             model.addRow(new Object[]{
                 s.getId(),
@@ -80,19 +78,18 @@ public class AdminPanel extends javax.swing.JPanel {
         }
 
         DeleteButtonColumn.addDeleteButton(tableListClass, 3, (row) -> {
-            // Dừng editing trước khi xóa
             if (tableListClass.isEditing()) {
                 tableListClass.getCellEditor().stopCellEditing();
             }
 
-            int studentId = (int) model.getValueAt(row, 0); // Lấy ID sinh viên
+            int studentId = (int) model.getValueAt(row, 0);
             boolean success = classesDAO.deleteClassById(studentId);
 
             if (success) {
                 refreshTableClasses();
-                JOptionPane.showMessageDialog(this, "✅ Xóa sinh viên thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                Toast.show("✅ Xóa lớp thành công!");
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Xóa sinh viên thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                Toast.show("❌ Xóa lớp thất bại!");
             }
         });
     }
@@ -121,9 +118,9 @@ public class AdminPanel extends javax.swing.JPanel {
 
             if (success) {
                 refreshTableSubject();
-                JOptionPane.showMessageDialog(this, "✅ Xóa môn học thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                Toast.show("✅ Xóa môn học thành công!");
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Xóa môn học thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                Toast.show("❌ Xóa môn học thất bại!");
             }
         });
     }
@@ -153,22 +150,21 @@ public class AdminPanel extends javax.swing.JPanel {
             tbListStudent.getCellEditor().stopCellEditing();
         }
         if (row >= model.getRowCount()) {
-            System.err.println("❌ Lỗi: Hàng cần xóa không tồn tại!");
+            Toast.show("❌ Lỗi: Hàng cần xóa không tồn tại!");
             return;
         }
 
-        int studentId = (int) model.getValueAt(row, 0); // Lấy ID sinh viên
+        int studentId = (int) model.getValueAt(row, 0); 
 
         boolean success = studentDAO.deleteStudentById(studentId);
         if (success) {
-            refreshTableStudent(); // Cập nhật lại bảng sau khi xóa
-            JOptionPane.showMessageDialog(this, "✅ Xóa sinh viên thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            refreshTableStudent();
+            Toast.show("✅ Xóa sinh viên thành công!");
         } else {
-            JOptionPane.showMessageDialog(this, "❌ Xóa sinh viên thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Xóa sinh viên thất bại!");
         }
     }
 
-    // Callback khi nhấn nút "Đổi Lớp"
     private void showChangeClassPopup(int row) {
         DefaultTableModel model = (DefaultTableModel) tbListStudent.getModel();
 
@@ -437,7 +433,7 @@ public class AdminPanel extends javax.swing.JPanel {
 
                     studentExists = studentDAO.getStudentById(studentId);
                     if (studentExists == null) {
-                        JOptionPane.showMessageDialog(this, "❌ Sinh viên không tồn tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        Toast.show("❌ Sinh viên không tồn tại");
                         return;
                     }
 
@@ -478,9 +474,9 @@ public class AdminPanel extends javax.swing.JPanel {
                     boolean success = studentDAO.updateStudent(student);
 
                     if (success) {
-                        JOptionPane.showMessageDialog(this, "✅ Cập nhật sinh viên thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                        Toast.show("✅ Cập nhật sinh viên thành công!");
                     } else {
-                        JOptionPane.showMessageDialog(this, "❌ Cập nhật sinh viên thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        Toast.show("❌ Cập nhật sinh viên thất bại!");
                     }
                 } catch (Exception ex) {
 
@@ -495,7 +491,7 @@ public class AdminPanel extends javax.swing.JPanel {
 
                     System.err.println(ex);
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "❌ Cập nhật sinh viên thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    Toast.show("❌ Cập nhật sinh viên thất bại!");
 
                 }
 
@@ -505,7 +501,7 @@ public class AdminPanel extends javax.swing.JPanel {
 
     private void btnCreateStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateStudentActionPerformed
         AddStudentDialog addDialog = new AddStudentDialog((JFrame) SwingUtilities.getWindowAncestor(this), true, this);
-        addDialog.setLocationRelativeTo(this); // Hiển thị ở giữa màn hình
+        addDialog.setLocationRelativeTo(this);
         addDialog.setVisible(true);
     }//GEN-LAST:event_btnCreateStudentActionPerformed
 
@@ -533,7 +529,7 @@ public class AdminPanel extends javax.swing.JPanel {
 
                     classesExists = classesDAO.getClassById(id);
                     if (classesExists == null) {
-                        JOptionPane.showMessageDialog(this, "❌ Lớp học không tồn tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        Toast.show("❌ Lớp học không tồn tại");
                         return;
                     }
 
@@ -551,9 +547,9 @@ public class AdminPanel extends javax.swing.JPanel {
                     boolean success = classesDAO.updateClasses(classes);
 
                     if (success) {
-                        JOptionPane.showMessageDialog(this, "✅ Cập nhật lớp học thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                        Toast.show("✅ Cập nhật lớp học thành công!");
                     } else {
-                        JOptionPane.showMessageDialog(this, "❌ Cập nhật lớp học thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        Toast.show("❌ Cập nhật lớp học thất bại!");
                     }
                 } catch (Exception ex) {
 
@@ -564,7 +560,7 @@ public class AdminPanel extends javax.swing.JPanel {
 
                     System.err.println(ex);
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "❌ Cập nhật lớp học thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    Toast.show("❌ Cập nhật lớp học thất bại!");
 
                 }
 

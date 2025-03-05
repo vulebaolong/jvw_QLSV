@@ -1,5 +1,6 @@
 package view.dialog;
 
+import components.Toast;
 import dao.ClassesDAO;
 import dao.StudentDAO;
 import java.util.List;
@@ -27,8 +28,8 @@ public class ChangeClassDialog extends javax.swing.JDialog {
 
     private void loadStudentData(Student student) {
         cbbClasses.removeAllItems();
-        
-        cbbClasses.addItem("0" + " - " + "chưa có lớp" );
+
+        cbbClasses.addItem("0" + " - " + "chưa có lớp");
         List<Classes> classList = classesDAO.getAllClasses();
         for (Classes cls : classList) {
             String item = cls.getId() + " - " + cls.getClassName() + " - " + cls.getDepartment();
@@ -222,12 +223,12 @@ public class ChangeClassDialog extends javax.swing.JDialog {
             if (adminPanel != null) {
                 adminPanel.refreshTableStudent();
             }
-
-            JOptionPane.showMessageDialog(this, "✅ Đổi lớp thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            
+            Toast.show("✅ Đổi lớp thành công!");
 
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "❌ Đổi lớp thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Đổi lớp thất bại!");
         }
 
     }//GEN-LAST:event_btnChangeActionPerformed

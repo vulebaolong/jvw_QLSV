@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
+import components.Toast;
 
 /**
  *
@@ -19,12 +20,17 @@ public class LoginPanel extends javax.swing.JPanel {
 
     private MainFrame mainFrame;
     private UserDAO userDao;
+    private HeaderPanel headerPanel;
+    private StudentPanel studentPanel;
 
     /**
      * Creates new form LoginPanel
      */
-    public LoginPanel(MainFrame frame) {
+    public LoginPanel(MainFrame frame, HeaderPanel headerPanel, StudentPanel studentPanel) {
         this.mainFrame = frame;
+        this.headerPanel = headerPanel;
+        this.studentPanel = studentPanel;
+
         this.userDao = new UserDAO();
         initComponents();
     }
@@ -64,9 +70,7 @@ public class LoginPanel extends javax.swing.JPanel {
 
         txtEmail.setText("long@gmail.com");
 
-        lbRegister.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbRegister.setText("Register");
-        lbRegister.setAlignmentY(0.0F);
         lbRegister.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lbRegisterMouseClicked(evt);
@@ -92,9 +96,11 @@ public class LoginPanel extends javax.swing.JPanel {
                 .addContainerGap(283, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbRegister)
-                    .addComponent(jLabel1))
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbRegister)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -112,9 +118,9 @@ public class LoginPanel extends javax.swing.JPanel {
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(30, 30, 30)
                 .addComponent(btnLogin)
-                .addGap(20, 20, 20)
+                .addGap(18, 18, 18)
                 .addComponent(lbRegister)
-                .addContainerGap(194, Short.MAX_VALUE))
+                .addContainerGap(196, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -123,13 +129,13 @@ public class LoginPanel extends javax.swing.JPanel {
         String password = new String(txtPassword.getPassword()).trim();
 
         if (email.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Email không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Email không được để trống!");
             txtEmail.requestFocus();
             return;
         }
 
         if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Mật khẩu không được để trống!");
             txtPassword.requestFocus();
             return;
         }
@@ -140,7 +146,7 @@ public class LoginPanel extends javax.swing.JPanel {
         User userExists = userDao.getUserByEmail(email);
 
         if (userExists == null) {
-            JOptionPane.showMessageDialog(this, String.format("Email: %s không tồn tại", email), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Email không tồn tại");
             txtEmail.requestFocus();
             return;
         }
@@ -150,32 +156,37 @@ public class LoginPanel extends javax.swing.JPanel {
         boolean isPassword = BCrypt.checkpw(password, hashedPassword);
 
         if (!isPassword) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu không chính xác", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Mật khẩu không chính xác");
             txtPassword.requestFocus();
             return;
         }
 
-        JOptionPane.showMessageDialog(this, "Đăng nhập thành công");
+        Toast.show("✅ Đăng nhập thành công!");
 
         String role = userExists.getRole();
 
         UserSession.saveUserId(userExists.getId());
 
+        this.headerPanel.loadDataHeader();
+        this.studentPanel.loadInfoUserData();
+
+        mainFrame.showLayout("ClientLayout");
+
         switch (role) {
             case "Admin":
-                ((MainFrame) SwingUtilities.getWindowAncestor(this)).showPanel("Admin");
+                mainFrame.showPanelClient("Admin");
                 break;
             case "Teacher":
-                ((MainFrame) SwingUtilities.getWindowAncestor(this)).showPanel("Teacher");
+                mainFrame.showPanelClient("Teacher");
                 break;
             default:
-                ((MainFrame) SwingUtilities.getWindowAncestor(this)).showPanel("Student");
+                mainFrame.showPanelClient("Student");
                 break;
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void lbRegisterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbRegisterMouseClicked
-        ((MainFrame) SwingUtilities.getWindowAncestor(this)).showPanel("Register");
+        mainFrame.showPanelAuth("Register");
     }//GEN-LAST:event_lbRegisterMouseClicked
 
 

@@ -4,6 +4,7 @@
  */
 package view.dialog;
 
+import components.Toast;
 import javax.swing.JOptionPane;
 import model.Classes;
 import dao.ClassesDAO;
@@ -124,7 +125,7 @@ public class AddClassDialog extends javax.swing.JDialog {
             String department = txtDepartment.getText().trim();
 
             if (className.isEmpty() || department.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                Toast.show("❌ Vui lòng điền đầy đủ thông tin!");
                 return;
             }
 
@@ -132,18 +133,17 @@ public class AddClassDialog extends javax.swing.JDialog {
             boolean success = classesDAO.addClass(classes);
 
             if (success) {
-                JOptionPane.showMessageDialog(this, "✅ Thêm lớp học thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-
+                Toast.show("✅ Thêm lớp học thành công!");
                 if (adminPanel != null) {
                     adminPanel.refreshTableClasses();
                 }
 
                 this.dispose(); // Đóng dialog
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Thêm sinh viên thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                Toast.show("❌ Thêm sinh viên thất bại!");
             }
         } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "❌ Ngày sinh không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Ngày sinh không hợp lệ!");
         }
     }//GEN-LAST:event_btnCreateDepartmentActionPerformed
 

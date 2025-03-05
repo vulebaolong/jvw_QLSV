@@ -18,103 +18,6 @@ import java.security.NoSuchAlgorithmException;
  * @author vulebaolong
  */
 public class UserDAO {
-    // Đăng ký sinh viên (thêm vào bảng Students và Users)
-
-    public boolean registerStudent(Student student, String username, String password) {
-        Connection conn = null;
-        PreparedStatement stmtStudent = null;
-        PreparedStatement stmtUser = null;
-        ResultSet generatedKeys = null;
-
-        String sqlStudent = "INSERT INTO Students (fullName, birthDay, gender, email, phone, address) VALUES (?, ?, ?, ?, ?, ?)";
-        String sqlUser = "INSERT INTO Users (username, password, role, studentId) VALUES (?, ?, 'Student', ?)";
-
-        try {
-            conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // Bắt đầu giao dịch
-
-            // Thêm sinh viên vào bảng Students
-            stmtStudent = conn.prepareStatement(sqlStudent, Statement.RETURN_GENERATED_KEYS);
-            stmtStudent.setString(1, student.getFullName());
-            stmtStudent.setDate(2, student.getBirthDay());
-            stmtStudent.setString(3, student.getGender());
-            stmtStudent.setString(4, student.getPhone());
-            stmtStudent.setString(5, student.getAddress());
-            int affectedRows = stmtStudent.executeUpdate();
-
-            if (affectedRows == 0) {
-                conn.rollback();
-                return false;
-            }
-
-            // Lấy ID của sinh viên mới
-            generatedKeys = stmtStudent.getGeneratedKeys();
-            int studentId;
-            if (generatedKeys.next()) {
-                studentId = generatedKeys.getInt(1);
-            } else {
-                conn.rollback();
-                return false;
-            }
-
-            // Thêm tài khoản vào bảng Users
-            stmtUser = conn.prepareStatement(sqlUser);
-            stmtUser.setString(1, username);
-            stmtUser.setString(2, hashPassword(password)); // Mã hóa mật khẩu trước khi lưu
-            stmtUser.setInt(3, studentId);
-
-            affectedRows = stmtUser.executeUpdate();
-            if (affectedRows == 0) {
-                conn.rollback();
-                return false;
-            }
-
-            conn.commit(); // Xác nhận giao dịch
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Quay lại trạng thái ban đầu nếu lỗi
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            return false;
-        } finally {
-            try {
-                if (generatedKeys != null) {
-                    generatedKeys.close();
-                }
-                if (stmtStudent != null) {
-                    stmtStudent.close();
-                }
-                if (stmtUser != null) {
-                    stmtUser.close();
-                }
-                if (conn != null) {
-                    conn.setAutoCommit(true); // Bật lại AutoCommit
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // Hàm mã hóa mật khẩu bằng SHA-256
-    private String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                hexString.append(String.format("%02x", b));
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Lỗi mã hóa mật khẩu!", e);
-        }
-    }
 
     // Thêm người dùng mới
     public boolean addUser(User user) {
@@ -203,25 +106,48 @@ public class UserDAO {
     }
 
     public User getUserById(int id) {
-        String sql = "SELECT * FROM Users WHERE id = ?";
+        String sql = "SELECT u.id AS userId, u.email, u.password, u.role, u.createdAt AS userCreatedAt, u.updatedAt AS userUpdatedAt, "
+                + "s.id AS studentId, s.fullName, s.birthDay, s.gender, s.phone, s.address, s.classId, "
+                + "s.createdAt AS studentCreatedAt, s.updatedAt AS studentUpdatedAt "
+                + "FROM Users u "
+                + "LEFT JOIN Students s ON u.studentId = s.id "
+                + "WHERE u.id = ?";
+
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return new User(
-                       rs.getInt("id"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("role"),
-                        rs.getObject("studentId") != null ? rs.getInt("studentId") : null,
-                        rs.getTimestamp("createdAt"),
-                        rs.getTimestamp("updatedAt")
-                );
+                // 🔹 Lấy thông tin User
+                int userId = rs.getInt("userId");
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                String role = rs.getString("role");
+                Timestamp userCreatedAt = rs.getTimestamp("userCreatedAt");
+                Timestamp userUpdatedAt = rs.getTimestamp("userUpdatedAt");
+
+                // 🔹 Lấy thông tin Student nếu có
+                Student student = null;
+                Integer studentId = rs.getObject("studentId") != null ? rs.getInt("studentId") : null;
+                if (studentId != null) {
+                    student = new Student(
+                            studentId,
+                            rs.getString("fullName"),
+                            rs.getDate("birthDay"),
+                            rs.getString("gender"),
+                            rs.getString("phone"),
+                            rs.getString("address"),
+                            rs.getObject("classId") != null ? rs.getInt("classId") : null,
+                            rs.getTimestamp("studentCreatedAt"),
+                            rs.getTimestamp("studentUpdatedAt")
+                    );
+                }
+
+                return new User(userId, email, password, role, studentId, userCreatedAt, userUpdatedAt, student);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // In lỗi ra console
         }
         return null;
     }

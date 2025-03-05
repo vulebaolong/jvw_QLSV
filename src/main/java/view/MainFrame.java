@@ -7,6 +7,9 @@ package view;
 import java.awt.CardLayout;
 import model.User;
 import session.UserSession;
+import javax.swing.*;
+import java.awt.*;
+import components.Toast;
 
 /**
  *
@@ -14,13 +17,17 @@ import session.UserSession;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private CardLayout cardLayout;
+    private CardLayout clientCardLayout;
+    private CardLayout authCardLayout;
+    private JPanel contentPanel;
+    private JPanel authPanel;
+    private JPanel clientPanel;
 
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
-        initComponents();
+//        initComponents();
         initCustomComponents();
     }
 
@@ -36,6 +43,7 @@ public class MainFrame extends javax.swing.JFrame {
         mainPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(1000, 600));
 
         mainPanel.setAlignmentX(0.0F);
         mainPanel.setAlignmentY(0.0F);
@@ -94,51 +102,98 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initCustomComponents() {
-        // Tạo CardLayout cho mainPanel
-        cardLayout = new CardLayout();
-        mainPanel.setLayout(cardLayout);
 
-        // Thêm các panel con vào mainPanel
-        RegisterPanel registerPanel = new RegisterPanel(this);
-        LoginPanel loginPanel = new LoginPanel(this);
+        int heightHeader = 70;
+        int heightContent = 500;
+        int heightApp = heightHeader + heightContent;
+        int widthApp = 1000;
+
+        
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Quản lý sinh viên");
+        setSize(widthApp, heightApp);
+        setLayout(new CardLayout()); // Sử dụng CardLayout cho JFrame
+
+        // 🔹 **1. Layout Client (Có Header)** --------------------------------
+        clientPanel = new JPanel(new BorderLayout());
+
+        // 👉 Header
+        HeaderPanel headerPanel = new HeaderPanel(this);
+        headerPanel.setPreferredSize(new Dimension(widthApp, heightHeader));
+        clientPanel.add(headerPanel, BorderLayout.NORTH);
+
+        // 👉 Content Panel
+        contentPanel = new JPanel();
+        clientCardLayout = new CardLayout(); // 👉 Thêm CardLayout riêng cho Client
+        contentPanel.setLayout(clientCardLayout);
+        contentPanel.setPreferredSize(new Dimension(widthApp, heightContent));
+        // 👉 Các màn hình trong clientPanel
         AdminPanel adminPanel = new AdminPanel();
         TeacherPanel teacherPanel = new TeacherPanel();
         StudentPanel studentPanel = new StudentPanel();
+        contentPanel.add(adminPanel, "Admin");
+        contentPanel.add(teacherPanel, "Teacher");
+        contentPanel.add(studentPanel, "Student");
+        clientPanel.add(contentPanel, BorderLayout.CENTER);
+        // ----------------------------------------------------------------------
 
-        mainPanel.add(registerPanel, "Register");
-        mainPanel.add(loginPanel, "Login");
-        mainPanel.add(adminPanel, "Admin");
-        mainPanel.add(teacherPanel, "Teacher");
-        mainPanel.add(studentPanel, "Student");
-        
+        // 🔹 **2. Layout Auth (Full màn hình)** --------------------------------
+        authPanel = new JPanel();
+        authCardLayout = new CardLayout(); // 👉 Thêm CardLayout riêng cho Auth
+        authPanel.setLayout(authCardLayout);
+        authPanel.setPreferredSize(new Dimension(widthApp, heightApp));
+
+        // 👉 Login & Register Panel (Không có header)
+        LoginPanel loginPanel = new LoginPanel(this, headerPanel, studentPanel);
+        RegisterPanel registerPanel = new RegisterPanel(this);
+        authPanel.add(loginPanel, "Login");
+        authPanel.add(registerPanel, "Register");
+        // ----------------------------------------------------------------------
+
+        // 🔹 Thêm vào JFrame (Dùng CardLayout để chuyển đổi giữa Auth & Client)
+        add(authPanel, "AuthLayout");
+        add(clientPanel, "ClientLayout");
+
+        // 🔹 Xác định màn hình khi mở ứng dụng
         UserSession.printAllPreferences();
+        User currentUser = UserSession.getInfo();
+        showLayout(currentUser != null ? "ClientLayout" : "AuthLayout");
 
-        User curentUser = UserSession.checkWhenOpenApp();
-
-        if (curentUser != null) {
-            switch (curentUser.getRole()) {
+        if (currentUser != null) {
+            switch (currentUser.getRole()) {
                 case "Admin":
-                    cardLayout.show(mainPanel, "Admin");
+                    showPanelClient("Admin");
                     break;
                 case "Teacher":
-                    cardLayout.show(mainPanel, "Teacher");
+                    showPanelClient("Teacher");
                     break;
                 default:
-                    cardLayout.show(mainPanel, "Student");
+                    showPanelClient("Student");
                     break;
             }
         } else {
-            cardLayout.show(mainPanel, "Login");
+            showPanelAuth("Login");
         }
 
-        // Căn giữa cửa sổ
-        pack();
         setLocationRelativeTo(null);
+        setVisible(true);
+        Toast.init(this, 2000, Toast.Position.BOTTOM_RIGHT);
     }
 
-    public void showPanel(String panelName) {
-        CardLayout cl = (CardLayout) mainPanel.getLayout();
-        cl.show(mainPanel, panelName);
+    public void showPanelClient(String panelName) {
+        showLayout("ClientLayout"); // Hiển thị ClientLayout
+        clientCardLayout.show(contentPanel, panelName); // Chuyển panel bên trong ClientLayout
+    }
+
+    public void showPanelAuth(String panelName) {
+        showLayout("AuthLayout"); // Hiển thị AuthLayout
+        authCardLayout.show(authPanel, panelName); // Chuyển panel bên trong AuthLayout
+    }
+
+    public void showLayout(String layoutName) {
+        CardLayout layout = (CardLayout) getContentPane().getLayout();
+        layout.show(getContentPane(), layoutName);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -4,6 +4,7 @@
  */
 package view.dialog;
 
+import components.Toast;
 import dao.SubjectsDAO;
 import javax.swing.JOptionPane;
 import model.Subject;
@@ -121,7 +122,7 @@ public class AddSubjectDialog extends javax.swing.JDialog {
         int credit = (Integer) numCredit.getValue();
 
         if (subjectName.isEmpty() || credit <= 0) {
-            JOptionPane.showMessageDialog(this, "❌ Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Vui lòng nhập đầy đủ thông tin!");
             return;
         }
 
@@ -134,15 +135,14 @@ public class AddSubjectDialog extends javax.swing.JDialog {
                 if (adminPanel != null) {
                     adminPanel.refreshTableSubject();
                 }
-
-                JOptionPane.showMessageDialog(this, "✅ Thêm môn học thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                Toast.show("✅ Thêm môn học thành công!");
 
                 this.dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Thêm môn học thất bại! Tên môn học có thể đã tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                Toast.show("❌ Thêm môn học thất bại!");
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "❌ Số tín chỉ phải là một số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Toast.show("❌ Số tín chỉ phải là một số hợp lệ!");
         }
     }//GEN-LAST:event_btnCreateSubjectActionPerformed
 
