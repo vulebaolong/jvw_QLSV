@@ -10,6 +10,7 @@ import model.Student;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Classes;
 
 /**
  *
@@ -38,10 +39,28 @@ public class StudentDAO {
     // Lấy danh sách sinh viên
     public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
-        String sql = "SELECT * FROM Students ORDER BY createdAt DESC";
+        String sql = "SELECT s.*, c.className, c.department, c.createdAt AS classCreatedAt, c.updatedAt AS classUpdatedAt "
+                + "FROM Students s "
+                + "LEFT JOIN Classes c ON s.classId = c.id "
+                + "ORDER BY s.createdAt DESC";
+
         try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                // 🔹 Lấy thông tin Class nếu có
+                Classes studentClass = null;
+                Integer classId = rs.getObject("classId") != null ? rs.getInt("classId") : null;
+                if (classId != null) {
+                    studentClass = new Classes(
+                            classId,
+                            rs.getString("className"),
+                            rs.getString("department"),
+                            rs.getTimestamp("classCreatedAt"),
+                            rs.getTimestamp("classUpdatedAt")
+                    );
+                }
+
+                // 🔹 Lấy thông tin Student
                 Student student = new Student(
                         rs.getInt("id"),
                         rs.getString("fullName"),
@@ -49,10 +68,12 @@ public class StudentDAO {
                         rs.getString("gender"),
                         rs.getString("phone"),
                         rs.getString("address"),
-                        rs.getInt("classId"),
+                        classId,
                         rs.getTimestamp("createdAt"),
-                        rs.getTimestamp("updatedAt")
+                        rs.getTimestamp("updatedAt"),
+                        studentClass // Gán thông tin Class vào Student
                 );
+
                 students.add(student);
             }
         } catch (SQLException e) {
@@ -84,13 +105,31 @@ public class StudentDAO {
     }
 
     public Student getStudentById(int id) {
-        String sql = "SELECT * FROM Students WHERE id = ?";
+        String sql = "SELECT s.*, c.className, c.department, c.createdAt AS classCreatedAt, c.updatedAt AS classUpdatedAt "
+                + "FROM Students s "
+                + "LEFT JOIN Classes c ON s.classId = c.id "
+                + "WHERE s.id = ?";
+
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
+                // 🔹 Lấy thông tin Class nếu có
+                Classes studentClass = null;
+                Integer classId = rs.getObject("classId") != null ? rs.getInt("classId") : null;
+                if (classId != null) {
+                    studentClass = new Classes(
+                            classId,
+                            rs.getString("className"),
+                            rs.getString("department"),
+                            rs.getTimestamp("classCreatedAt"),
+                            rs.getTimestamp("classUpdatedAt")
+                    );
+                }
+
+                // 🔹 Lấy thông tin Student
                 return new Student(
                         rs.getInt("id"),
                         rs.getString("fullName"),
@@ -98,9 +137,10 @@ public class StudentDAO {
                         rs.getString("gender"),
                         rs.getString("phone"),
                         rs.getString("address"),
-                        rs.getInt("classId"),
+                        classId,
                         rs.getTimestamp("createdAt"),
-                        rs.getTimestamp("updatedAt")
+                        rs.getTimestamp("updatedAt"),
+                        studentClass // Gán thông tin Class vào Student
                 );
             }
         } catch (SQLException e) {

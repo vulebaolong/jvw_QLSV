@@ -7,12 +7,20 @@ package view;
 import dao.ClassesDAO;
 import dao.SubjectsDAO;
 import dao.StudentDAO;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import model.Classes;
 import model.Student;
 import session.UserSession;
 import model.User;
+import view.dialog.AddStudentDialog;
+import view.dialog.RegisterStudentDialog;
 
 /**
  *
@@ -36,29 +44,63 @@ public class StudentPanel extends javax.swing.JPanel {
 
     public void loadInfoUserData() {
         User user = UserSession.getInfo();
-        System.out.println("oke" + user);
-        if (user == null) {
-            panelInfoStudent.setVisible(false);
-            return;
-        }
-
         Student student = user.getStudent();
-        if (student == null) {
-            panelInfoStudent.setVisible(false);
-            return;
-        }
+        panelInfoStudent.setPreferredSize(new Dimension(572, 262));
 
-        panelInfoStudent.setVisible(true);
-        
-        lbFullname.setText(student.getFullName());
-        lbBirthDay.setText(student.getBirthDay().toString());
+        if (user == null || student == null) {
+            jButton1.setVisible(true);
+            lbFullname.setVisible(false);
+            lbBirthDay.setVisible(false);
+            lbYear.setVisible(false);
+            lbClass.setVisible(false);
+            lbDepartment.setVisible(false);
 
-        Timestamp createdAt = student.getCreatedAt();
-        if (createdAt != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
-            lbYear.setText(sdf.format(new Date(createdAt.getTime())));
+            lb1.setVisible(false);
+            lb2.setVisible(false);
+            lb3.setVisible(false);
+            lb4.setVisible(false);
+            lb5.setVisible(false);
+            lb6.setVisible(false);
+            lb7.setVisible(false);
+            lb8.setVisible(false);
+            lb9.setVisible(false);
+            lb10.setVisible(false);
+
         } else {
-            lbYear.setText("N/A");
+            jButton1.setVisible(false);
+            lbFullname.setVisible(true);
+            lbBirthDay.setVisible(true);
+            lbYear.setVisible(true);
+            lbClass.setVisible(true);
+            lbDepartment.setVisible(true);
+
+            lb1.setVisible(true);
+            lb2.setVisible(true);
+            lb3.setVisible(true);
+            lb4.setVisible(true);
+            lb5.setVisible(true);
+            lb6.setVisible(true);
+            lb7.setVisible(true);
+            lb8.setVisible(true);
+            lb9.setVisible(true);
+            lb10.setVisible(true);
+
+            lbFullname.setText(student.getFullName());
+            lbBirthDay.setText(student.getBirthDay().toString());
+
+            Timestamp createdAt = student.getCreatedAt();
+            if (createdAt != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+                lbYear.setText(sdf.format(new Date(createdAt.getTime())));
+            } else {
+                lbYear.setText("N/A");
+            }
+
+            Classes classes = student.getClasses();
+            if (classes != null) {
+                lbClass.setText(classes.getClassName());
+                lbDepartment.setText(classes.getDepartment());
+            }
         }
 
     }
@@ -76,22 +118,23 @@ public class StudentPanel extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         tbListSubjects = new javax.swing.JTable();
         panelInfoStudent = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        lb1 = new javax.swing.JLabel();
+        lb2 = new javax.swing.JLabel();
         lbFullname = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
+        lb3 = new javax.swing.JLabel();
+        lb4 = new javax.swing.JLabel();
         lbBirthDay = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
+        lb5 = new javax.swing.JLabel();
+        lb6 = new javax.swing.JLabel();
         lbDepartment = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
+        lb7 = new javax.swing.JLabel();
+        lb8 = new javax.swing.JLabel();
         lbYear = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        lb9 = new javax.swing.JLabel();
+        lb10 = new javax.swing.JLabel();
         lbClass = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(1000, 500));
         setRequestFocusEnabled(false);
@@ -114,11 +157,11 @@ public class StudentPanel extends javax.swing.JPanel {
 
         panelInfoStudent.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
 
-        jLabel3.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
-        jLabel3.setText("Họ tên/");
+        lb1.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
+        lb1.setText("Họ tên/");
 
-        jLabel1.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
-        jLabel1.setText("Fullname:");
+        lb2.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
+        lb2.setText("Fullname:");
 
         lbFullname.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
         lbFullname.setText("------------------------");
@@ -126,41 +169,48 @@ public class StudentPanel extends javax.swing.JPanel {
         jLabel5.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
         jLabel5.setText("Sinh Viên");
 
-        jLabel21.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
-        jLabel21.setText("Ngày sinh/");
+        lb3.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
+        lb3.setText("Ngày sinh/");
 
-        jLabel22.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
-        jLabel22.setText("DoB:");
+        lb4.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
+        lb4.setText("DoB:");
 
         lbBirthDay.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         lbBirthDay.setText("-----------------------------------");
 
-        jLabel24.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
-        jLabel24.setText("Ngành học/");
+        lb5.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
+        lb5.setText("Ngành học/");
 
-        jLabel25.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
-        jLabel25.setText("Major:");
+        lb6.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
+        lb6.setText("Major:");
 
         lbDepartment.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         lbDepartment.setText("-----------------------------------");
 
-        jLabel27.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
-        jLabel27.setText("Năm nhập học/");
+        lb7.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
+        lb7.setText("Năm nhập học/");
 
-        jLabel28.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
-        jLabel28.setText("Year of admission:");
+        lb8.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
+        lb8.setText("Year of admission:");
 
         lbYear.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         lbYear.setText("-----------------------------------");
 
-        jLabel6.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
-        jLabel6.setText("Lớp/");
+        lb9.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
+        lb9.setText("Lớp/");
 
-        jLabel7.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
-        jLabel7.setText("Class:");
+        lb10.setFont(new java.awt.Font("Helvetica Neue", 2, 10)); // NOI18N
+        lb10.setText("Class:");
 
         lbClass.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
         lbClass.setText("---");
+
+        jButton1.setText("Đăng ký sinh viên");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelInfoStudentLayout = new javax.swing.GroupLayout(panelInfoStudent);
         panelInfoStudent.setLayout(panelInfoStudentLayout);
@@ -173,18 +223,18 @@ public class StudentPanel extends javax.swing.JPanel {
             .addGroup(panelInfoStudentLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel28)
-                    .addComponent(jLabel25)
-                    .addComponent(jLabel22)
+                    .addComponent(lb8)
+                    .addComponent(lb6)
+                    .addComponent(lb4)
                     .addGroup(panelInfoStudentLayout.createSequentialGroup()
                         .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
+                            .addComponent(lb2)
                             .addGroup(panelInfoStudentLayout.createSequentialGroup()
                                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel21)
-                                    .addComponent(jLabel24)
-                                    .addComponent(jLabel27))
+                                    .addComponent(lb1)
+                                    .addComponent(lb3)
+                                    .addComponent(lb5)
+                                    .addComponent(lb7))
                                 .addGap(32, 32, 32)
                                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(lbBirthDay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -193,51 +243,57 @@ public class StudentPanel extends javax.swing.JPanel {
                                     .addComponent(lbFullname, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addGap(18, 18, 18)
                         .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel7)
+                            .addComponent(lb10)
                             .addGroup(panelInfoStudentLayout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                                .addComponent(lb9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(lbClass, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(20, 20, 20))
+            .addGroup(panelInfoStudentLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelInfoStudentLayout.setVerticalGroup(
             panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelInfoStudentLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelInfoStudentLayout.createSequentialGroup()
                         .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
+                            .addComponent(lb1)
                             .addComponent(lbFullname))
                         .addGap(0, 0, 0)
-                        .addComponent(jLabel1))
+                        .addComponent(lb2))
                     .addGroup(panelInfoStudentLayout.createSequentialGroup()
                         .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
+                            .addComponent(lb9)
                             .addComponent(lbClass))
                         .addGap(0, 0, 0)
-                        .addComponent(jLabel7)))
+                        .addComponent(lb10)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel21)
+                    .addComponent(lb3)
                     .addComponent(lbBirthDay))
                 .addGap(0, 0, 0)
-                .addComponent(jLabel22)
+                .addComponent(lb4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel24)
+                    .addComponent(lb5)
                     .addComponent(lbDepartment))
                 .addGap(0, 0, 0)
-                .addComponent(jLabel25)
+                .addComponent(lb6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel27)
+                    .addComponent(lb7)
                     .addComponent(lbYear))
                 .addGap(0, 0, 0)
-                .addComponent(jLabel28)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addComponent(lb8)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -247,23 +303,20 @@ public class StudentPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(panelInfoStudent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                            .addComponent(jLabel2)
+                            .addComponent(panelInfoStudent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 416, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelInfoStudent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
+                .addComponent(panelInfoStudent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -271,21 +324,28 @@ public class StudentPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        RegisterStudentDialog addDialog = new RegisterStudentDialog((JFrame) SwingUtilities.getWindowAncestor(this), true, this);
+        addDialog.setLocationRelativeTo(this);
+        addDialog.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lb1;
+    private javax.swing.JLabel lb10;
+    private javax.swing.JLabel lb2;
+    private javax.swing.JLabel lb3;
+    private javax.swing.JLabel lb4;
+    private javax.swing.JLabel lb5;
+    private javax.swing.JLabel lb6;
+    private javax.swing.JLabel lb7;
+    private javax.swing.JLabel lb8;
+    private javax.swing.JLabel lb9;
     private javax.swing.JLabel lbBirthDay;
     private javax.swing.JLabel lbClass;
     private javax.swing.JLabel lbDepartment;

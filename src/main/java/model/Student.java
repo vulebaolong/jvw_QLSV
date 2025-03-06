@@ -20,10 +20,11 @@ public class Student {
     private String phone;
     private String address;
     private int classId;
+    private Classes classes;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    public Student(int id, String fullName, Date birthDay, String gender, String phone, String address, int classId, Timestamp createdAt, Timestamp updatedAt) {
+    public Student(int id, String fullName, Date birthDay, String gender, String phone, String address, int classId, Timestamp createdAt, Timestamp updatedAt, Classes classes) {
         this.id = id;
         this.fullName = fullName;
         this.birthDay = birthDay;
@@ -33,6 +34,7 @@ public class Student {
         this.classId = classId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.classes = classes;
     }
 
     public Student(int id, String fullName, Date birthDay, String gender, String phone, String address) {
@@ -74,6 +76,14 @@ public class Student {
 
     public int getId() {
         return id;
+    }
+
+    public void setClasses(Classes classes) {
+        this.classes = classes;
+    }
+
+    public Classes getClasses() {
+        return classes;
     }
 
     public String getFullName() {

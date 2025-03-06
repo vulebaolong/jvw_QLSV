@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import model.Classes;
 
 /**
  *
@@ -108,9 +109,11 @@ public class UserDAO {
     public User getUserById(int id) {
         String sql = "SELECT u.id AS userId, u.email, u.password, u.role, u.createdAt AS userCreatedAt, u.updatedAt AS userUpdatedAt, "
                 + "s.id AS studentId, s.fullName, s.birthDay, s.gender, s.phone, s.address, s.classId, "
-                + "s.createdAt AS studentCreatedAt, s.updatedAt AS studentUpdatedAt "
+                + "s.createdAt AS studentCreatedAt, s.updatedAt AS studentUpdatedAt, "
+                + "c.className, c.department, c.createdAt AS classCreatedAt, c.updatedAt AS classUpdatedAt "
                 + "FROM Users u "
                 + "LEFT JOIN Students s ON u.studentId = s.id "
+                + "LEFT JOIN Classes c ON s.classId = c.id "
                 + "WHERE u.id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -127,6 +130,19 @@ public class UserDAO {
                 Timestamp userCreatedAt = rs.getTimestamp("userCreatedAt");
                 Timestamp userUpdatedAt = rs.getTimestamp("userUpdatedAt");
 
+                // 🔹 Lấy thông tin Class nếu có
+                Classes studentClass = null;
+                Integer classId = rs.getObject("classId") != null ? rs.getInt("classId") : null;
+                if (classId != null) {
+                    studentClass = new Classes(
+                            classId,
+                            rs.getString("className"),
+                            rs.getString("department"),
+                            rs.getTimestamp("classCreatedAt"),
+                            rs.getTimestamp("classUpdatedAt")
+                    );
+                }
+
                 // 🔹 Lấy thông tin Student nếu có
                 Student student = null;
                 Integer studentId = rs.getObject("studentId") != null ? rs.getInt("studentId") : null;
@@ -138,16 +154,17 @@ public class UserDAO {
                             rs.getString("gender"),
                             rs.getString("phone"),
                             rs.getString("address"),
-                            rs.getObject("classId") != null ? rs.getInt("classId") : null,
+                            classId,
                             rs.getTimestamp("studentCreatedAt"),
-                            rs.getTimestamp("studentUpdatedAt")
+                            rs.getTimestamp("studentUpdatedAt"),
+                            studentClass 
                     );
                 }
 
                 return new User(userId, email, password, role, studentId, userCreatedAt, userUpdatedAt, student);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // In lỗi ra console
+            e.printStackTrace(); 
         }
         return null;
     }
