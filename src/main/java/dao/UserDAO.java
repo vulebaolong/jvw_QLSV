@@ -130,7 +130,7 @@ public class UserDAO {
                 Timestamp userCreatedAt = rs.getTimestamp("userCreatedAt");
                 Timestamp userUpdatedAt = rs.getTimestamp("userUpdatedAt");
 
-                // 🔹 Lấy thông tin Class nếu có
+                // 🔹 Lấy thông tin Class (nếu có)
                 Classes studentClass = null;
                 Integer classId = rs.getObject("classId") != null ? rs.getInt("classId") : null;
                 if (classId != null) {
@@ -143,7 +143,7 @@ public class UserDAO {
                     );
                 }
 
-                // 🔹 Lấy thông tin Student nếu có
+                // 🔹 Lấy thông tin Student (nếu có)
                 Student student = null;
                 Integer studentId = rs.getObject("studentId") != null ? rs.getInt("studentId") : null;
                 if (studentId != null) {
@@ -154,17 +154,17 @@ public class UserDAO {
                             rs.getString("gender"),
                             rs.getString("phone"),
                             rs.getString("address"),
-                            classId,
+                            classId != null ? classId : 0, // Tránh gọi `rs.getInt("classId")` nhiều lần
                             rs.getTimestamp("studentCreatedAt"),
                             rs.getTimestamp("studentUpdatedAt"),
-                            studentClass 
+                            studentClass // Sử dụng object `studentClass` đã tạo trước đó
                     );
                 }
 
                 return new User(userId, email, password, role, studentId, userCreatedAt, userUpdatedAt, student);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
         return null;
     }

@@ -37,7 +37,7 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public User(int userId, String email, String password, String role, Integer studentId, Timestamp createdAt, Timestamp updatedAt, Student student) {
+    public User(int id, String email, String password, String role, Integer studentId, Timestamp createdAt, Timestamp updatedAt, Student student) {
         this.id = id;
         this.email = email;
         this.password = password;

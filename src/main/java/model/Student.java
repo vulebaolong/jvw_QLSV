@@ -45,8 +45,19 @@ public class Student {
         this.phone = phone;
         this.address = address;
     }
-    
-     public Student(String fullName, Date birthDay, String gender, String phone, String address) {
+
+    public Student(int id, String fullName, Date birthDay, String gender, String phone, String address, Timestamp createdAt, Timestamp updatedAt) {
+        this.id = id;
+        this.fullName = fullName;
+        this.birthDay = birthDay;
+        this.gender = gender;
+        this.phone = phone;
+        this.address = address;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public Student(String fullName, Date birthDay, String gender, String phone, String address) {
         this.fullName = fullName;
         this.birthDay = birthDay;
         this.gender = gender;

@@ -9,6 +9,8 @@ import dao.StudentDAO;
 import java.sql.Date;
 import javax.swing.JOptionPane;
 import model.Student;
+import model.User;
+import session.UserSession;
 import view.AdminPanel;
 import view.StudentPanel;
 
@@ -179,18 +181,22 @@ public class RegisterStudentDialog extends javax.swing.JDialog {
             }
 
             Student student = new Student(fullName, birthDate, gender, phone, address);
-            boolean success = studentDAO.addStudent(student);
+            User currentUser = UserSession.getInfo();
+
+            System.out.println("✅ User: " + currentUser);
+            System.out.println("✅ User ID: " + currentUser.getId());
+            boolean success = studentDAO.registerStudentByStudent(student, currentUser.getId());
 
             if (success) {
                 if (studentPanel != null) {
                     studentPanel.loadInfoUserData();
                 }
 
-                Toast.show("✅ Thêm sinh viên thành công!");
+                Toast.show("✅ Đăng ký sinh viên thành công!");
 
                 this.dispose();
             } else {
-                Toast.show("❌ Thêm sinh viên thất bại!");
+                Toast.show("❌ Đăng ký sinh viên thất bại!");
             }
         } catch (IllegalArgumentException e) {
             Toast.show("❌ Ngày sinh không hợp lệ!");

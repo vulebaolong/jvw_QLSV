@@ -20,6 +20,8 @@ import model.Student;
 import session.UserSession;
 import model.User;
 import view.dialog.AddStudentDialog;
+import view.dialog.ChangeClassDialog;
+import view.dialog.RegisterClassDialog;
 import view.dialog.RegisterStudentDialog;
 
 /**
@@ -45,6 +47,7 @@ public class StudentPanel extends javax.swing.JPanel {
     public void loadInfoUserData() {
         User user = UserSession.getInfo();
         Student student = user.getStudent();
+
         panelInfoStudent.setPreferredSize(new Dimension(572, 262));
 
         if (user == null || student == null) {
@@ -54,6 +57,8 @@ public class StudentPanel extends javax.swing.JPanel {
             lbYear.setVisible(false);
             lbClass.setVisible(false);
             lbDepartment.setVisible(false);
+
+            btnRegisterClass.setVisible(true);
 
             lb1.setVisible(false);
             lb2.setVisible(false);
@@ -95,11 +100,14 @@ public class StudentPanel extends javax.swing.JPanel {
             } else {
                 lbYear.setText("N/A");
             }
-
             Classes classes = student.getClasses();
             if (classes != null) {
                 lbClass.setText(classes.getClassName());
                 lbDepartment.setText(classes.getDepartment());
+                btnRegisterClass.setVisible(false);
+
+            } else {
+                btnRegisterClass.setVisible(true);
             }
         }
 
@@ -135,6 +143,7 @@ public class StudentPanel extends javax.swing.JPanel {
         lb10 = new javax.swing.JLabel();
         lbClass = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        btnRegisterClass = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(1000, 500));
         setRequestFocusEnabled(false);
@@ -212,14 +221,17 @@ public class StudentPanel extends javax.swing.JPanel {
             }
         });
 
+        btnRegisterClass.setText("Đăng ký lớp học");
+        btnRegisterClass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterClassActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelInfoStudentLayout = new javax.swing.GroupLayout(panelInfoStudent);
         panelInfoStudent.setLayout(panelInfoStudentLayout);
         panelInfoStudentLayout.setHorizontalGroup(
             panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelInfoStudentLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel5)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(panelInfoStudentLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -243,15 +255,21 @@ public class StudentPanel extends javax.swing.JPanel {
                                     .addComponent(lbFullname, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addGap(18, 18, 18)
                         .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lb10)
                             .addGroup(panelInfoStudentLayout.createSequentialGroup()
                                 .addComponent(lb9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lbClass, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(20, 20, 20))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbClass, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelInfoStudentLayout.createSequentialGroup()
+                                .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lb10)
+                                    .addComponent(btnRegisterClass))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addGap(107, 107, 107))
             .addGroup(panelInfoStudentLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(jButton1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelInfoStudentLayout.setVerticalGroup(
@@ -273,12 +291,13 @@ public class StudentPanel extends javax.swing.JPanel {
                         .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lb9)
                             .addComponent(lbClass))
-                        .addGap(0, 0, 0)
+                        .addGap(1, 1, 1)
                         .addComponent(lb10)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lb3)
-                    .addComponent(lbBirthDay))
+                    .addComponent(lbBirthDay)
+                    .addComponent(btnRegisterClass))
                 .addGap(0, 0, 0)
                 .addComponent(lb4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -307,8 +326,8 @@ public class StudentPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(panelInfoStudent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 416, Short.MAX_VALUE)))
+                            .addComponent(panelInfoStudent, javax.swing.GroupLayout.PREFERRED_SIZE, 563, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 425, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -316,7 +335,7 @@ public class StudentPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panelInfoStudent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -330,8 +349,15 @@ public class StudentPanel extends javax.swing.JPanel {
         addDialog.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void btnRegisterClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterClassActionPerformed
+        RegisterClassDialog registerClassDialog = new RegisterClassDialog((JFrame) SwingUtilities.getWindowAncestor(this), true, this);
+        registerClassDialog.setLocationRelativeTo(this);
+        registerClassDialog.setVisible(true);
+    }//GEN-LAST:event_btnRegisterClassActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnRegisterClass;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;

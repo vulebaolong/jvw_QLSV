@@ -36,6 +36,90 @@ public class StudentDAO {
         }
     }
 
+    public boolean registerStudentByStudent(Student student, int userId) {
+        String insertStudentSQL = "INSERT INTO Students (fullName, birthDay, gender, phone, address) VALUES (?, ?, ?, ?, ?)";
+        String updateUserSQL = "UPDATE Users SET studentId = ? WHERE id = ?";
+
+        Connection conn = null;
+        PreparedStatement stmtStudent = null;
+        PreparedStatement stmtUser = null;
+        ResultSet generatedKeys = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // 🔹 Bắt đầu transaction
+
+            // 🔹 1. Thêm sinh viên vào bảng Students
+            stmtStudent = conn.prepareStatement(insertStudentSQL, Statement.RETURN_GENERATED_KEYS);
+            stmtStudent.setString(1, student.getFullName());
+            stmtStudent.setDate(2, student.getBirthDay());
+            stmtStudent.setString(3, student.getGender());
+            stmtStudent.setString(4, student.getPhone());
+            stmtStudent.setString(5, student.getAddress());
+
+            int affectedRows = stmtStudent.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("❌ Thêm sinh viên thất bại, không có dòng nào bị ảnh hưởng!");
+            }
+
+            // 🔹 Lấy `id` của sinh viên vừa tạo
+            generatedKeys = stmtStudent.getGeneratedKeys();
+            if (!generatedKeys.next()) {
+                throw new SQLException("❌ Lỗi: Không thể lấy ID sinh viên vừa tạo!");
+            }
+            int studentId = generatedKeys.getInt(1); // Lấy ID mới của sinh viên
+            System.out.println("✅ Student ID mới: " + studentId);
+            System.out.println("✅ User ID: " + userId);
+
+            // 🔹 2. Cập nhật studentId vào Users
+            stmtUser = conn.prepareStatement(updateUserSQL);
+            stmtUser.setInt(1, studentId);
+            stmtUser.setInt(2, userId);
+
+            int updatedRows = stmtUser.executeUpdate();
+            if (updatedRows == 0) {
+                throw new SQLException("❌ Cập nhật user thất bại, không có dòng nào bị ảnh hưởng!");
+            }
+
+            // 🔹 Nếu tất cả thành công, commit transaction
+            conn.commit();
+            System.out.println("✅ Đăng ký sinh viên và cập nhật user thành công!");
+            return true;
+
+        } catch (SQLException e) {
+            // 🔹 Rollback nếu có lỗi
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    System.out.println("🔄 Đã rollback! Không có thay đổi nào được thực hiện.");
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+            return false;
+
+        } finally {
+            // 🔹 Đóng tài nguyên
+            try {
+                if (generatedKeys != null) {
+                    generatedKeys.close();
+                }
+                if (stmtStudent != null) {
+                    stmtStudent.close();
+                }
+                if (stmtUser != null) {
+                    stmtUser.close();
+                }
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     // Lấy danh sách sinh viên
     public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
@@ -50,6 +134,7 @@ public class StudentDAO {
                 // 🔹 Lấy thông tin Class nếu có
                 Classes studentClass = null;
                 Integer classId = rs.getObject("classId") != null ? rs.getInt("classId") : null;
+                Student student = null;
                 if (classId != null) {
                     studentClass = new Classes(
                             classId,
@@ -58,21 +143,30 @@ public class StudentDAO {
                             rs.getTimestamp("classCreatedAt"),
                             rs.getTimestamp("classUpdatedAt")
                     );
+                    student = new Student(
+                            rs.getInt("id"),
+                            rs.getString("fullName"),
+                            rs.getDate("birthDay"),
+                            rs.getString("gender"),
+                            rs.getString("phone"),
+                            rs.getString("address"),
+                            classId,
+                            rs.getTimestamp("createdAt"),
+                            rs.getTimestamp("updatedAt"),
+                            studentClass
+                    );
+                } else {
+                    student = new Student(
+                            rs.getInt("id"),
+                            rs.getString("fullName"),
+                            rs.getDate("birthDay"),
+                            rs.getString("gender"),
+                            rs.getString("phone"),
+                            rs.getString("address"),
+                            rs.getTimestamp("createdAt"),
+                            rs.getTimestamp("updatedAt")
+                    );
                 }
-
-                // 🔹 Lấy thông tin Student
-                Student student = new Student(
-                        rs.getInt("id"),
-                        rs.getString("fullName"),
-                        rs.getDate("birthDay"),
-                        rs.getString("gender"),
-                        rs.getString("phone"),
-                        rs.getString("address"),
-                        classId,
-                        rs.getTimestamp("createdAt"),
-                        rs.getTimestamp("updatedAt"),
-                        studentClass // Gán thông tin Class vào Student
-                );
 
                 students.add(student);
             }
