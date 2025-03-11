@@ -23,11 +23,14 @@ public class MainFrame extends javax.swing.JFrame {
     private JPanel authPanel;
     private JPanel clientPanel;
 
+    public AdminPanel adminPanel;
+    public TeacherPanel teacherPanel;
+    public StudentPanel studentPanel;
+
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
-//        initComponents();
         initCustomComponents();
     }
 
@@ -102,13 +105,10 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initCustomComponents() {
-
         int heightHeader = 70;
         int heightContent = 500;
         int heightApp = heightHeader + heightContent;
         int widthApp = 1000;
-
-        
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Quản lý sinh viên");
@@ -129,9 +129,9 @@ public class MainFrame extends javax.swing.JFrame {
         contentPanel.setLayout(clientCardLayout);
         contentPanel.setPreferredSize(new Dimension(widthApp, heightContent));
         // 👉 Các màn hình trong clientPanel
-        AdminPanel adminPanel = new AdminPanel();
-        TeacherPanel teacherPanel = new TeacherPanel();
-        StudentPanel studentPanel = new StudentPanel();
+        adminPanel = new AdminPanel();
+        teacherPanel = new TeacherPanel();
+        studentPanel = new StudentPanel();
         contentPanel.add(adminPanel, "Admin");
         contentPanel.add(teacherPanel, "Teacher");
         contentPanel.add(studentPanel, "Student");
@@ -182,13 +182,13 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     public void showPanelClient(String panelName) {
-        showLayout("ClientLayout"); // Hiển thị ClientLayout
-        clientCardLayout.show(contentPanel, panelName); // Chuyển panel bên trong ClientLayout
+        showLayout("ClientLayout");
+        clientCardLayout.show(contentPanel, panelName);
     }
 
     public void showPanelAuth(String panelName) {
-        showLayout("AuthLayout"); // Hiển thị AuthLayout
-        authCardLayout.show(authPanel, panelName); // Chuyển panel bên trong AuthLayout
+        showLayout("AuthLayout");
+        authCardLayout.show(authPanel, panelName);
     }
 
     public void showLayout(String layoutName) {

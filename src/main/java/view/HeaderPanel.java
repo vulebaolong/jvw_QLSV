@@ -34,7 +34,10 @@ public class HeaderPanel extends javax.swing.JPanel {
             lbEmail.setText(currentUser.getEmail());
             lbRole.setText(currentUser.getRole());
         }
-
+    }
+    
+    public void reloadDataHeader () {
+        loadDataHeader();
     }
 
     /**

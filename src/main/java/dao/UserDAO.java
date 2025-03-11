@@ -13,6 +13,7 @@ import java.util.List;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import model.Classes;
+import model.Teacher;
 
 /**
  *
@@ -108,12 +109,15 @@ public class UserDAO {
 
     public User getUserById(int id) {
         String sql = "SELECT u.id AS userId, u.email, u.password, u.role, u.createdAt AS userCreatedAt, u.updatedAt AS userUpdatedAt, "
-                + "s.id AS studentId, s.fullName, s.birthDay, s.gender, s.phone, s.address, s.classId, "
-                + "s.createdAt AS studentCreatedAt, s.updatedAt AS studentUpdatedAt, "
-                + "c.className, c.department, c.createdAt AS classCreatedAt, c.updatedAt AS classUpdatedAt "
+                + "s.id AS studentId, s.fullName AS studentFullName, s.birthDay AS studentBirthDay, s.gender AS studentGender, "
+                + "s.phone AS studentPhone, s.address AS studentAddress, s.classId, s.createdAt AS studentCreatedAt, s.updatedAt AS studentUpdatedAt, "
+                + "c.className, c.department, c.createdAt AS classCreatedAt, c.updatedAt AS classUpdatedAt, "
+                + "t.id AS teacherId, t.fullName AS teacherFullName, t.birthDay AS teacherBirthDay, t.gender AS teacherGender, "
+                + "t.phone AS teacherPhone, t.address AS teacherAddress, t.createdAt AS teacherCreatedAt, t.updatedAt AS teacherUpdatedAt "
                 + "FROM Users u "
                 + "LEFT JOIN Students s ON u.studentId = s.id "
                 + "LEFT JOIN Classes c ON s.classId = c.id "
+                + "LEFT JOIN Teachers t ON u.teacherId = t.id "
                 + "WHERE u.id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -132,7 +136,7 @@ public class UserDAO {
 
                 // 🔹 Lấy thông tin Class (nếu có)
                 Classes studentClass = null;
-                Integer classId = rs.getObject("classId") != null ? rs.getInt("classId") : null;
+                Integer classId = (rs.getObject("classId") != null) ? rs.getInt("classId") : null;
                 if (classId != null) {
                     studentClass = new Classes(
                             classId,
@@ -145,23 +149,54 @@ public class UserDAO {
 
                 // 🔹 Lấy thông tin Student (nếu có)
                 Student student = null;
-                Integer studentId = rs.getObject("studentId") != null ? rs.getInt("studentId") : null;
+                Integer studentId = (rs.getObject("studentId") != null) ? rs.getInt("studentId") : null;
                 if (studentId != null) {
-                    student = new Student(
-                            studentId,
-                            rs.getString("fullName"),
-                            rs.getDate("birthDay"),
-                            rs.getString("gender"),
-                            rs.getString("phone"),
-                            rs.getString("address"),
-                            classId != null ? classId : 0, // Tránh gọi `rs.getInt("classId")` nhiều lần
-                            rs.getTimestamp("studentCreatedAt"),
-                            rs.getTimestamp("studentUpdatedAt"),
-                            studentClass // Sử dụng object `studentClass` đã tạo trước đó
+                    if (classId == null) {
+                        student = new Student(
+                                studentId,
+                                rs.getString("studentFullName"),
+                                rs.getDate("studentBirthDay"),
+                                rs.getString("studentGender"),
+                                rs.getString("studentPhone"),
+                                rs.getString("studentAddress"),
+                                rs.getTimestamp("studentCreatedAt"),
+                                rs.getTimestamp("studentUpdatedAt"),
+                                studentClass
+                        );
+                    } else {
+                        student = new Student(
+                                studentId,
+                                rs.getString("studentFullName"),
+                                rs.getDate("studentBirthDay"),
+                                rs.getString("studentGender"),
+                                rs.getString("studentPhone"),
+                                rs.getString("studentAddress"),
+                                classId,
+                                rs.getTimestamp("studentCreatedAt"),
+                                rs.getTimestamp("studentUpdatedAt"),
+                                studentClass
+                        );
+                    }
+
+                }
+
+                // 🔹 Lấy thông tin Teacher (nếu có)
+                Teacher teacher = null;
+                Integer teacherId = (rs.getObject("teacherId") != null) ? rs.getInt("teacherId") : null;
+                if (teacherId != null) {
+                    teacher = new Teacher(
+                            teacherId,
+                            rs.getString("teacherFullName"),
+                            rs.getDate("teacherBirthDay"),
+                            rs.getString("teacherGender"),
+                            rs.getString("teacherPhone"),
+                            rs.getString("teacherAddress"),
+                            rs.getTimestamp("teacherCreatedAt"),
+                            rs.getTimestamp("teacherUpdatedAt")
                     );
                 }
 
-                return new User(userId, email, password, role, studentId, userCreatedAt, userUpdatedAt, student);
+                return new User(userId, email, password, role, studentId, teacherId, userCreatedAt, userUpdatedAt, student, teacher);
             }
         } catch (SQLException e) {
             e.printStackTrace();

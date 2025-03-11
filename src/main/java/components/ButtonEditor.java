@@ -26,7 +26,7 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
         void deleteRow(int row);
     }
 
-    public ButtonEditor(JTable table, DeleteAction deleteAction) {
+    public ButtonEditor(String textPopup, JTable table, DeleteAction deleteAction) {
         this.table = table;
         this.deleteAction = deleteAction;
         button = new JButton("Xóa");
@@ -36,10 +36,15 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(button, "Bạn có chắc muốn xóa dòng này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    deleteAction.deleteRow(row); // Gọi hàm deleteRow để xóa
+                if (textPopup == "") {
+                    deleteAction.deleteRow(row);
+                } else {
+                    int confirm = JOptionPane.showConfirmDialog(button, textPopup, "Xác nhận", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        deleteAction.deleteRow(row); // Gọi hàm deleteRow để xóa
+                    }
                 }
+
                 fireEditingStopped(); // Dừng việc chỉnh sửa ô
             }
         });

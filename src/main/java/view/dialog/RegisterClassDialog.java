@@ -46,7 +46,7 @@ public class RegisterClassDialog extends javax.swing.JDialog {
         for (Classes cls : classList) {
             String item = cls.getId() + " - " + cls.getClassName() + " - " + cls.getDepartment();
             cbbClasses.addItem(item);
-            if (cls.getId() > 0 && student != null) {
+            if (cls.getId() > 0 && student != null && student.getClassId() == cls.getId()) {
 //                System.out.println(student.getClassId());
 //                System.out.println(cls.getId());
                 cbbClasses.setSelectedItem(item);
@@ -149,7 +149,7 @@ public class RegisterClassDialog extends javax.swing.JDialog {
         boolean success = studentDAO.updateStudentClass(student.getId(), newClassId);
         if (success) {
             if (studentPanel != null) {
-                studentPanel.loadInfoUserData();
+                studentPanel.reloadDataStudent();
             }
 
             Toast.show("✅ Đăng ký lớp thành công!");

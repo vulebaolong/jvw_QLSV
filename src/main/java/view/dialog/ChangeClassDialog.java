@@ -221,7 +221,7 @@ public class ChangeClassDialog extends javax.swing.JDialog {
         boolean success = studentDAO.updateStudentClass(this.student.getId(), newClassId);
         if (success) {
             if (adminPanel != null) {
-                adminPanel.refreshTableStudent();
+                adminPanel.reloadDataAdmin();
             }
             
             Toast.show("✅ Đổi lớp thành công!");

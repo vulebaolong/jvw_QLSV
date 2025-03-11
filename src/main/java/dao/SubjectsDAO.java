@@ -42,7 +42,68 @@ public class SubjectsDAO {
                 Subject subject = new Subject(
                         rs.getInt("id"),
                         rs.getString("subjectName"),
-                        rs.getInt("credit")
+                        rs.getInt("credit"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getTimestamp("updatedAt")
+                );
+                subjects.add(subject);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return subjects;
+    }
+
+    // Lấy danh sách tất cả môn học chưa đăng ký
+    public List<Subject> getUnregisteredSubjects(int studentId) {
+        List<Subject> subjects = new ArrayList<>();
+        String sql = "SELECT s.id, s.subjectName, s.credit, s.createdAt, s.updatedAt "
+                + "FROM Subjects s "
+                + "LEFT JOIN Enrollments e ON s.id = e.subjectId AND e.studentId = ? "
+                + "WHERE e.subjectId IS NULL "
+                + "ORDER BY s.createdAt DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, studentId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Subject subject = new Subject(
+                        rs.getInt("id"),
+                        rs.getString("subjectName"),
+                        rs.getInt("credit"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getTimestamp("updatedAt")
+                );
+                subjects.add(subject);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return subjects;
+    }
+
+    public List<Subject> getUnregisteredSubjectsForTeacher(int teacherId) {
+        List<Subject> subjects = new ArrayList<>();
+        String sql = "SELECT s.id, s.subjectName, s.credit, s.createdAt, s.updatedAt "
+                + "FROM Subjects s "
+                + "LEFT JOIN TeacherSubject ts ON s.id = ts.subjectId AND ts.teacherId = ? "
+                + "WHERE ts.subjectId IS NULL "
+                + "ORDER BY s.createdAt DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, teacherId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Subject subject = new Subject(
+                        rs.getInt("id"),
+                        rs.getString("subjectName"),
+                        rs.getInt("credit"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getTimestamp("updatedAt")
                 );
                 subjects.add(subject);
             }

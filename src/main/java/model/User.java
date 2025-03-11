@@ -17,10 +17,11 @@ public class User {
     private String password;
     private String role;
     private Integer studentId;
+    private Integer teacherId;
     private Timestamp createdAt;
-    private Timestamp updatedAt;    
+    private Timestamp updatedAt;
     private Student student;
-
+    private Teacher teacher;
 
     public User(String email, String password) {
         this.email = email;
@@ -37,15 +38,26 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public User(int id, String email, String password, String role, Integer studentId, Timestamp createdAt, Timestamp updatedAt, Student student) {
+    public User(int id, String email, String password, String role, Integer studentId,Integer teacherId, Timestamp createdAt, Timestamp updatedAt, Student student, Teacher teacher) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
         this.studentId = studentId;
+        this.teacherId = teacherId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.student = student;
+        this.teacher = teacher;
+
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
     }
 
     public void setStudent(Student student) {

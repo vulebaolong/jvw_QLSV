@@ -20,10 +20,7 @@ public class DatabaseConnection {
     public static Connection getConnection() {
         Connection conn = null;
         try {
-            // Đăng ký MySQL Driver (Không cần thiết từ JDBC 4.0 trở đi)
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Kết nối đến database
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
             System.out.println("✅ Kết nối thành công!");
         } catch (ClassNotFoundException e) {

@@ -37,7 +37,7 @@ CREATE TABLE `Enrollments` (
     `subjectId` INT, -- Môn học đã đăng ký
     `semester` VARCHAR(10) NOT NULL, -- Học kỳ (VD: Fall, Spring...).
     `year` INT NOT NULL, -- Năm học.
-    `grade` FLOAT CHECK (grade >= 0 AND grade <= 10), -- Điểm môn học (thang 10).
+    `grade` FLOAT, -- Điểm môn học (thang 10).
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
 	`updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`studentId`) REFERENCES `Students`(id) ON DELETE CASCADE,
@@ -51,7 +51,30 @@ CREATE TABLE `Users` (
     `password` VARCHAR(255) NOT NULL, -- Mật khẩu (đã mã hóa)
     `role` ENUM('Admin', 'Teacher', 'Student') NOT NULL DEFAULT 'Student', -- Phân quyền (Admin, Teacher, Student).
     `studentId` INT UNIQUE, -- Nếu là sinh viên thì liên kết đến students.
+    `teacherId` INT UNIQUE,
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
 	`updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY (`studentId`) REFERENCES `Students`(id) ON DELETE SET NULL
+	FOREIGN KEY (`studentId`) REFERENCES `Students`(`id`) ON DELETE SET NULL,
+	FOREIGN KEY (`teacherId`) REFERENCES `Teachers`(`id`) ON DELETE SET NULL
 );
+
+CREATE TABLE `Teachers` (
+    `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `fullName` VARCHAR(255) NOT NULL, -- Họ tên giảng viên.
+    `birthDay` DATE NOT NULL, -- Ngày sinh.
+    `gender` ENUM('Male', 'Female', 'Other') NOT NULL, -- Giới tính.
+    `phone` VARCHAR(255) UNIQUE NOT NULL, -- Số điện thoại.    `address` TEXT, -- Địa chỉ.
+    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `TeacherSubject` (
+    `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `teacherId` INT NOT NULL, -- Giảng viên dạy lớp
+    `subjectId` INT NOT NULL, -- Môn học nào.
+    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`teacherId`) REFERENCES `Teachers`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`subjectId`) REFERENCES `Subjects`(`id`) ON DELETE CASCADE
+);
+

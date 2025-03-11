@@ -6,11 +6,11 @@ package view;
 
 import dao.UserDAO;
 import session.UserSession;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 import components.Toast;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  *
@@ -33,6 +33,33 @@ public class LoginPanel extends javax.swing.JPanel {
 
         this.userDao = new UserDAO();
         initComponents();
+        restoreRememberMeState();
+        listenEnter();
+    }
+
+    private void listenEnter() {
+        txtPassword.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btnLogin.doClick();
+                }
+            }
+        });
+
+        txtEmail.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btnLogin.doClick();
+                }
+            }
+        });
+    }
+
+    private void restoreRememberMeState() {
+        boolean isChecked = UserSession.getRememberMeState();
+        cbRemember.setSelected(isChecked);
     }
 
     /**
@@ -51,10 +78,16 @@ public class LoginPanel extends javax.swing.JPanel {
         lbEmail = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
         lbRegister = new javax.swing.JLabel();
+        cbRemember = new javax.swing.JCheckBox();
 
         lbPassword.setText("Password");
 
         txtPassword.setText("123123");
+        txtPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPasswordActionPerformed(evt);
+            }
+        });
 
         btnLogin.setText("Login");
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
@@ -68,7 +101,7 @@ public class LoginPanel extends javax.swing.JPanel {
 
         lbEmail.setText("Email:");
 
-        txtEmail.setText("long@gmail.com");
+        txtEmail.setText("admin@gmail.com");
 
         lbRegister.setText("Register");
         lbRegister.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -77,28 +110,40 @@ public class LoginPanel extends javax.swing.JPanel {
             }
         });
 
+        cbRemember.setText("Remember Me");
+        cbRemember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbRememberActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(283, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnLogin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(370, 370, 370)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lbPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lbEmail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
-                            .addComponent(txtEmail))))
-                .addContainerGap(283, Short.MAX_VALUE))
+                        .addComponent(lbPassword)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtPassword, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(cbRemember))
+                            .addComponent(btnLogin, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(370, 370, 370))))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lbRegister)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -106,21 +151,23 @@ public class LoginPanel extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(64, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbEmail)
-                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbPassword)
-                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30)
-                .addComponent(btnLogin)
+                .addGap(111, 111, 111)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
+                .addComponent(lbEmail)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(lbPassword)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbRemember)
+                .addGap(18, 18, 18)
+                .addComponent(btnLogin)
+                .addGap(10, 10, 10)
                 .addComponent(lbRegister)
-                .addContainerGap(196, Short.MAX_VALUE))
+                .addContainerGap(209, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -165,21 +212,31 @@ public class LoginPanel extends javax.swing.JPanel {
 
         String role = userExists.getRole();
 
-        UserSession.saveUserId(userExists.getId());
+        boolean rememberMeChecked = cbRemember.isSelected();
+        UserSession.saveRememberMeState(rememberMeChecked);
 
-        this.headerPanel.loadDataHeader();
-        this.studentPanel.loadInfoUserData();
+        if (rememberMeChecked) {
+            UserSession.saveUserId(userExists.getId());
+        } else {
+            UserSession.logout();
+        }
+
+        this.headerPanel.reloadDataHeader();
+        this.studentPanel.reloadDataStudent();
 
         mainFrame.showLayout("ClientLayout");
 
         switch (role) {
             case "Admin":
+                mainFrame.adminPanel.reloadDataAdmin();
                 mainFrame.showPanelClient("Admin");
                 break;
             case "Teacher":
+                mainFrame.teacherPanel.reloadDataTeacher();
                 mainFrame.showPanelClient("Teacher");
                 break;
             default:
+                mainFrame.studentPanel.reloadDataStudent();
                 mainFrame.showPanelClient("Student");
                 break;
         }
@@ -189,9 +246,19 @@ public class LoginPanel extends javax.swing.JPanel {
         mainFrame.showPanelAuth("Register");
     }//GEN-LAST:event_lbRegisterMouseClicked
 
+    private void cbRememberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbRememberActionPerformed
+        boolean isChecked = cbRemember.isSelected();
+        UserSession.saveRememberMeState(isChecked);
+    }//GEN-LAST:event_cbRememberActionPerformed
+
+    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPasswordActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
+    private javax.swing.JCheckBox cbRemember;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lbEmail;
     private javax.swing.JLabel lbPassword;

@@ -6,28 +6,35 @@ package view.dialog;
 
 import components.Toast;
 import dao.StudentDAO;
+import dao.TeacherDAO;
+import dao.UserDAO;
 import java.sql.Date;
 import javax.swing.JOptionPane;
 import model.Student;
+import model.Teacher;
+import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 import view.AdminPanel;
 
 /**
  *
  * @author vulebaolong
  */
-public class AddStudentDialog extends javax.swing.JDialog {
+public class AddTeacherDialog extends javax.swing.JDialog {
 
-    private StudentDAO studentDAO;
+    private TeacherDAO teacherDAO;
+    private UserDAO userDAO;
     private AdminPanel adminPanel;
 
     /**
      * Creates new form AddStudentDialog
      */
-    public AddStudentDialog(java.awt.Frame parent, boolean modal, AdminPanel adminPanel) {
+    public AddTeacherDialog(java.awt.Frame parent, boolean modal, AdminPanel adminPanel) {
         super(parent, modal);
         this.adminPanel = adminPanel;
         initComponents();
-        studentDAO = new StudentDAO();
+        teacherDAO = new TeacherDAO();
+        userDAO = new UserDAO();
     }
 
     /**
@@ -50,8 +57,12 @@ public class AddStudentDialog extends javax.swing.JDialog {
         lbAddress = new javax.swing.JLabel();
         txtAddress = new javax.swing.JTextField();
         lbCreateStudent = new javax.swing.JLabel();
-        btnCreateStudent = new javax.swing.JButton();
+        btnCreateTeacher = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        txtEmail = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtPassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -69,12 +80,12 @@ public class AddStudentDialog extends javax.swing.JDialog {
 
         lbCreateStudent.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
         lbCreateStudent.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbCreateStudent.setText("TẠO SINH VIÊN");
+        lbCreateStudent.setText("TẠO GIÁO VIÊN");
 
-        btnCreateStudent.setText("Tạo");
-        btnCreateStudent.addActionListener(new java.awt.event.ActionListener() {
+        btnCreateTeacher.setText("Tạo");
+        btnCreateTeacher.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCreateStudentActionPerformed(evt);
+                btnCreateTeacherActionPerformed(evt);
             }
         });
 
@@ -84,6 +95,10 @@ public class AddStudentDialog extends javax.swing.JDialog {
                 btnCancelActionPerformed(evt);
             }
         });
+
+        jLabel1.setText("Email");
+
+        jLabel2.setText("Password");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -95,34 +110,46 @@ public class AddStudentDialog extends javax.swing.JDialog {
                         .addGap(124, 124, 124)
                         .addComponent(lbCreateStudent))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(44, 44, 44)
+                        .addGap(43, 43, 43)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(btnCreateStudent, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnCreateTeacher, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lbFullname)
                                     .addComponent(lbBirthday)
                                     .addComponent(lbGender)
                                     .addComponent(lbPhone)
-                                    .addComponent(lbAddress))
+                                    .addComponent(lbAddress)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel2))
                                 .addGap(29, 29, 29)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtFullname)
-                                    .addComponent(dateBirthDay, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                                    .addComponent(dateBirthDay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(cbbGender, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(txtPhone)
-                                    .addComponent(txtAddress))))))
-                .addContainerGap(44, Short.MAX_VALUE))
+                                    .addComponent(txtAddress, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                                    .addComponent(txtEmail)
+                                    .addComponent(txtPassword))))))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(11, 11, 11)
                 .addComponent(lbCreateStudent)
+                .addGap(21, 21, 21)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(lbFullname)
                     .addComponent(txtFullname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -144,9 +171,9 @@ public class AddStudentDialog extends javax.swing.JDialog {
                     .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCreateStudent)
+                    .addComponent(btnCreateTeacher)
                     .addComponent(btnCancel))
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addGap(23, 23, 23))
         );
 
         pack();
@@ -156,8 +183,24 @@ public class AddStudentDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void btnCreateStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateStudentActionPerformed
+    private void btnCreateTeacherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateTeacherActionPerformed
         try {
+            // 🔹 1. Kiểm tra thông tin nhập vào
+            String email = txtEmail.getText().trim();
+            String password = new String(txtPassword.getPassword()).trim();
+
+            if (email.isEmpty()) {
+                Toast.show("❌ Email không được để trống!");
+                txtEmail.requestFocus();
+                return;
+            }
+
+            if (password.isEmpty()) {
+                Toast.show("❌ Mật khẩu không được để trống!");
+                txtPassword.requestFocus();
+                return;
+            }
+
             String fullName = txtFullname.getText().trim();
             String gender = cbbGender.getSelectedItem().toString();
             String phone = txtPhone.getText().trim();
@@ -166,7 +209,7 @@ public class AddStudentDialog extends javax.swing.JDialog {
             Date birthDate = null;
             java.util.Date selectedDate = dateBirthDay.getDate();
             if (selectedDate != null) {
-                birthDate = new Date(selectedDate.getTime()); // Chuyển thành java.sql.Date để lưu vào MySQL
+                birthDate = new Date(selectedDate.getTime()); // Chuyển thành java.sql.Date
             } else {
                 Toast.show("❌ Vui lòng chọn ngày sinh!");
                 return;
@@ -177,25 +220,38 @@ public class AddStudentDialog extends javax.swing.JDialog {
                 return;
             }
 
-            Student student = new Student(fullName, birthDate, gender, phone, address);
-            boolean success = studentDAO.addStudent(student);
+            // 🔹 2. Kiểm tra nếu email đã tồn tại
+            User userExists = userDAO.getUserByEmail(email);
+            if (userExists != null) {
+                Toast.show("❌ Email đã tồn tại!");
+                txtEmail.requestFocus();
+                return;
+            }
+
+            // 🔹 3. Tạo đối tượng User và Teacher
+            User user = new User(email, BCrypt.hashpw(password, BCrypt.gensalt(10)));
+            Teacher teacher = new Teacher(fullName, birthDate, gender, phone, address);
+
+            // 🔹 4. Gọi DAO để thực hiện transaction
+            boolean success = teacherDAO.addTeacherWithTransaction(user, teacher);
 
             if (success) {
+                Toast.show("✅ Thêm giảng viên thành công!");
+
+                // 🔹 5. Cập nhật giao diện
                 if (adminPanel != null) {
                     adminPanel.reloadDataAdmin();
                 }
 
-                Toast.show("✅ Thêm sinh viên thành công!");
-
                 this.dispose();
             } else {
-                Toast.show("❌ Thêm sinh viên thất bại!");
+                Toast.show("❌ Thêm giảng viên thất bại!");
             }
+
         } catch (IllegalArgumentException e) {
             Toast.show("❌ Ngày sinh không hợp lệ!");
-
         }
-    }//GEN-LAST:event_btnCreateStudentActionPerformed
+    }//GEN-LAST:event_btnCreateTeacherActionPerformed
 
     /**
      * @param args the command line arguments
@@ -214,20 +270,21 @@ public class AddStudentDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AddStudentDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddTeacherDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AddStudentDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddTeacherDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AddStudentDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddTeacherDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AddStudentDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddTeacherDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                AddStudentDialog dialog = new AddStudentDialog(new javax.swing.JFrame(), true, null);
+                AddTeacherDialog dialog = new AddTeacherDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -241,9 +298,11 @@ public class AddStudentDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnCreateStudent;
+    private javax.swing.JButton btnCreateTeacher;
     private javax.swing.JComboBox<String> cbbGender;
     private com.toedter.calendar.JDateChooser dateBirthDay;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lbAddress;
     private javax.swing.JLabel lbBirthday;
     private javax.swing.JLabel lbCreateStudent;
@@ -251,7 +310,9 @@ public class AddStudentDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lbGender;
     private javax.swing.JLabel lbPhone;
     private javax.swing.JTextField txtAddress;
+    private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtFullname;
+    private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtPhone;
     // End of variables declaration//GEN-END:variables
 }

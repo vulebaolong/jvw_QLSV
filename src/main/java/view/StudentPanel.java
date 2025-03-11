@@ -4,7 +4,10 @@
  */
 package view;
 
+import components.DeleteButtonColumn;
+import components.Toast;
 import dao.ClassesDAO;
+import dao.EnrollmentsDAO;
 import dao.SubjectsDAO;
 import dao.StudentDAO;
 import java.awt.BorderLayout;
@@ -13,10 +16,15 @@ import java.awt.Dimension;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 import model.Classes;
+import model.Enrollment;
 import model.Student;
+import model.Subject;
 import session.UserSession;
 import model.User;
 import view.dialog.AddStudentDialog;
@@ -33,6 +41,8 @@ public class StudentPanel extends javax.swing.JPanel {
     private ClassesDAO classesDAO;
     private SubjectsDAO subjectsDAO;
     private StudentDAO studentDAO;
+    private Student student;
+    private EnrollmentsDAO enrollmentsDAO;
 
     /**
      * Creates new form StudentPanel
@@ -41,24 +51,32 @@ public class StudentPanel extends javax.swing.JPanel {
         initComponents();
         classesDAO = new ClassesDAO();
         subjectsDAO = new SubjectsDAO();
+        enrollmentsDAO = new EnrollmentsDAO();
+        reloadDataStudent();
+    }
+
+    public void reloadDataStudent() {
         loadInfoUserData();
+        loadDataSubject();
+        loadRegisteredSubjects();
     }
 
     public void loadInfoUserData() {
         User user = UserSession.getInfo();
-        Student student = user.getStudent();
+
+        if (user != null) {
+            student = user.getStudent();
+        }
 
         panelInfoStudent.setPreferredSize(new Dimension(572, 262));
 
         if (user == null || student == null) {
-            jButton1.setVisible(true);
+            btnRegisterStudent.setVisible(true);
             lbFullname.setVisible(false);
             lbBirthDay.setVisible(false);
             lbYear.setVisible(false);
             lbClass.setVisible(false);
             lbDepartment.setVisible(false);
-
-            btnRegisterClass.setVisible(true);
 
             lb1.setVisible(false);
             lb2.setVisible(false);
@@ -70,9 +88,9 @@ public class StudentPanel extends javax.swing.JPanel {
             lb8.setVisible(false);
             lb9.setVisible(false);
             lb10.setVisible(false);
-
+            btnRegisterClass.setVisible(false);
         } else {
-            jButton1.setVisible(false);
+            btnRegisterStudent.setVisible(false);
             lbFullname.setVisible(true);
             lbBirthDay.setVisible(true);
             lbYear.setVisible(true);
@@ -104,13 +122,111 @@ public class StudentPanel extends javax.swing.JPanel {
             if (classes != null) {
                 lbClass.setText(classes.getClassName());
                 lbDepartment.setText(classes.getDepartment());
-                btnRegisterClass.setVisible(false);
-
             } else {
-                btnRegisterClass.setVisible(true);
+                lbClass.setText("---");
+                lbDepartment.setText("---");
+            }
+
+            if (student == null) {
+                btnRegisterStudent.setVisible(true);
+                btnRegisterClass.setVisible(false);
+            } else {
+                btnRegisterStudent.setVisible(false);
+                if (classes != null) {
+                    btnRegisterClass.setVisible(false);
+                } else {
+                    btnRegisterClass.setVisible(true);
+                    lbClass.setText("---");
+                    lbDepartment.setText("---");
+                }
             }
         }
 
+    }
+
+    public void loadDataSubject() {
+        DefaultTableModel model = (DefaultTableModel) tbListSubjects.getModel();
+        model.setRowCount(0);
+
+        User user = UserSession.getInfo();
+        if (user != null) {
+            Student student = user.getStudent();
+            if (student != null) {
+                Classes classes = student.getClasses();
+                if (classes == null) {
+                    return;
+                }
+            } else {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        int studentId = user.getStudent().getId();
+
+        List<Subject> subject = subjectsDAO.getUnregisteredSubjects(studentId);
+
+        for (Subject s : subject) {
+            model.addRow(new Object[]{
+                s.getId(),
+                s.getSubjectName(),
+                s.getCredit()
+            });
+        }
+
+        DeleteButtonColumn.addDeleteButton("Đăng ký", "Bạn có chắc muốn đăng ký?", tbListSubjects, 3, (row) -> {
+            if (tbListSubjects.isEditing()) {
+                tbListSubjects.getCellEditor().stopCellEditing();
+            }
+
+            int subjectId = (int) model.getValueAt(row, 0);
+            String semester = "Spring";
+            int year = java.time.LocalDate.now().getYear();
+
+            // Kiểm tra xem sinh viên đã đăng ký môn này chưa
+            if (enrollmentsDAO.isEnrolled(studentId, subjectId, semester, year)) {
+//                JOptionPane.showMessageDialog(this, "⚠ Bạn đã đăng ký môn này rồi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                Toast.show("⚠ Bạn đã đăng ký môn này rồi!");
+                return;
+            }
+
+            Enrollment enrollment = new Enrollment(studentId, subjectId, semester, year, -1); // Grade mặc định -1
+
+            boolean success = enrollmentsDAO.addEnrollment(enrollment);
+
+            if (success) {
+                reloadDataStudent();
+                Toast.show("✅ Đăng ký môn học thành công!");
+            } else {
+                JOptionPane.showMessageDialog(this, "❌ Đăng ký môn học thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+
+        });
+    }
+
+    private void loadRegisteredSubjects() {
+        DefaultTableModel model = (DefaultTableModel) tableRegistedSubject.getModel();
+        model.setRowCount(0);
+
+        User user = UserSession.getInfo();
+        if (user == null || user.getStudent() == null) {
+            return;
+        }
+
+        int studentId = user.getStudent().getId();
+        List<Enrollment> enrolledSubjects = enrollmentsDAO.getEnrolledSubjectsByStudentId(studentId);
+
+        for (Enrollment enrollment : enrolledSubjects) {
+            model.addRow(new Object[]{
+                enrollment.getSubject().getId(),
+                enrollment.getSubject().getSubjectName(),
+                enrollment.getSubject().getCredit(),
+                enrollment.getSemester(),
+                enrollment.getYear(),
+                (enrollment.getGrade() == -1) ? "Chưa có điểm" : enrollment.getGrade()
+            });
+        }
     }
 
     /**
@@ -142,8 +258,11 @@ public class StudentPanel extends javax.swing.JPanel {
         lb9 = new javax.swing.JLabel();
         lb10 = new javax.swing.JLabel();
         lbClass = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnRegisterStudent = new javax.swing.JButton();
         btnRegisterClass = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tableRegistedSubject = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1000, 500));
         setRequestFocusEnabled(false);
@@ -153,13 +272,13 @@ public class StudentPanel extends javax.swing.JPanel {
 
         tbListSubjects.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "ID", "Tên Môn Học", "Tín Chỉ"
+                "ID", "Tên Môn Học", "Tín Chỉ", "Action"
             }
         ));
         jScrollPane2.setViewportView(tbListSubjects);
@@ -214,10 +333,10 @@ public class StudentPanel extends javax.swing.JPanel {
         lbClass.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
         lbClass.setText("---");
 
-        jButton1.setText("Đăng ký sinh viên");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnRegisterStudent.setText("Đăng ký sinh viên");
+        btnRegisterStudent.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnRegisterStudentActionPerformed(evt);
             }
         });
 
@@ -254,22 +373,21 @@ public class StudentPanel extends javax.swing.JPanel {
                                     .addComponent(lbYear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(lbFullname, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addGap(18, 18, 18)
-                        .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(panelInfoStudentLayout.createSequentialGroup()
                                 .addComponent(lb9)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lbClass, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelInfoStudentLayout.createSequentialGroup()
-                                .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lb10)
-                                    .addComponent(btnRegisterClass))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addGap(107, 107, 107))
-            .addGroup(panelInfoStudentLayout.createSequentialGroup()
+                                .addComponent(lbClass, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lb10)
+                            .addComponent(btnRegisterClass))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInfoStudentLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLabel5)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInfoStudentLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jButton1))
+                .addComponent(btnRegisterStudent)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelInfoStudentLayout.setVerticalGroup(
@@ -278,7 +396,7 @@ public class StudentPanel extends javax.swing.JPanel {
                 .addGap(20, 20, 20)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(btnRegisterStudent)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelInfoStudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelInfoStudentLayout.createSequentialGroup()
@@ -315,6 +433,21 @@ public class StudentPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        tableRegistedSubject.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "ID", "Tên môn học", "Tina chỉ"
+            }
+        ));
+        jScrollPane3.setViewportView(tableRegistedSubject);
+
+        jLabel1.setText("Môn đã đăng ký");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -324,17 +457,28 @@ public class StudentPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(panelInfoStudent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(panelInfoStudent, javax.swing.GroupLayout.PREFERRED_SIZE, 563, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 425, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelInfoStudent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(panelInfoStudent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -343,11 +487,11 @@ public class StudentPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnRegisterStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterStudentActionPerformed
         RegisterStudentDialog addDialog = new RegisterStudentDialog((JFrame) SwingUtilities.getWindowAncestor(this), true, this);
         addDialog.setLocationRelativeTo(this);
         addDialog.setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnRegisterStudentActionPerformed
 
     private void btnRegisterClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterClassActionPerformed
         RegisterClassDialog registerClassDialog = new RegisterClassDialog((JFrame) SwingUtilities.getWindowAncestor(this), true, this);
@@ -358,10 +502,12 @@ public class StudentPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegisterClass;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnRegisterStudent;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel lb1;
     private javax.swing.JLabel lb10;
     private javax.swing.JLabel lb2;
@@ -378,6 +524,7 @@ public class StudentPanel extends javax.swing.JPanel {
     private javax.swing.JLabel lbFullname;
     private javax.swing.JLabel lbYear;
     private javax.swing.JPanel panelInfoStudent;
+    private javax.swing.JTable tableRegistedSubject;
     private javax.swing.JTable tbListSubjects;
     // End of variables declaration//GEN-END:variables
 }

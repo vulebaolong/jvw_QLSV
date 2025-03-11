@@ -133,7 +133,7 @@ public class AddSubjectDialog extends javax.swing.JDialog {
 
             if (success) {
                 if (adminPanel != null) {
-                    adminPanel.refreshTableSubject();
+                    adminPanel.reloadDataAdmin();
                 }
                 Toast.show("✅ Thêm môn học thành công!");
 

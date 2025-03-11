@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 import view.MainFrame;
 import javax.swing.*;
 import com.formdev.flatlaf.FlatDarkLaf;
+import database.DatabaseInitializer;
 
 public class Main {
 
@@ -16,6 +17,8 @@ public class Main {
         } catch (Exception e) {
             System.err.println("Không thể đặt giao diện Dark Mode.");
         }
+
+        DatabaseInitializer.initializeDatabase();
 
         SwingUtilities.invokeLater(() -> {
             MainFrame mainFrame = new MainFrame();

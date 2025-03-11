@@ -135,7 +135,7 @@ public class AddClassDialog extends javax.swing.JDialog {
             if (success) {
                 Toast.show("✅ Thêm lớp học thành công!");
                 if (adminPanel != null) {
-                    adminPanel.refreshTableClasses();
+                    adminPanel.reloadDataAdmin();
                 }
 
                 this.dispose(); // Đóng dialog

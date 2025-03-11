@@ -188,9 +188,7 @@ public class RegisterStudentDialog extends javax.swing.JDialog {
             boolean success = studentDAO.registerStudentByStudent(student, currentUser.getId());
 
             if (success) {
-                if (studentPanel != null) {
-                    studentPanel.loadInfoUserData();
-                }
+                studentPanel.reloadDataStudent();
 
                 Toast.show("✅ Đăng ký sinh viên thành công!");
 

@@ -6,22 +6,23 @@ package model;
 
 import java.sql.Timestamp;
 
-
 /**
  *
  * @author vulebaolong
  */
 public class Enrollment {
+
     private int id;
     private int studentId;
     private int subjectId;
     private String semester;
     private int year;
     private float grade;
+    private Subject subject;
     private Timestamp createdAt;
     private Timestamp updatedAt;
-    
-     public Enrollment(int id, int studentId, int subjectId, String semester, int year, float grade, Timestamp createdAt, Timestamp updatedAt) {
+
+    public Enrollment(int id, int studentId, int subjectId, String semester, int year, float grade, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.studentId = studentId;
         this.subjectId = subjectId;
@@ -30,6 +31,32 @@ public class Enrollment {
         this.grade = grade;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public Enrollment(int studentId, int subjectId, String semester, int year, int grade) {
+        this.studentId = studentId;
+        this.subjectId = subjectId;
+        this.semester = semester;
+        this.year = year;
+        this.grade = grade;
+    }
+
+    public Enrollment(int id, int studentId, int subjectId, String semester, int year, float grade, Subject subject) {
+        this.id = id;
+        this.studentId = studentId;
+        this.subjectId = subjectId;
+        this.semester = semester;
+        this.year = year;
+        this.grade = grade;
+        this.subject = subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    public Subject getSubject() {
+        return subject;
     }
 
     public int getId() {
@@ -95,7 +122,5 @@ public class Enrollment {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
-     
-     
-  
+
 }

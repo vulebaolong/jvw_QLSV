@@ -8,6 +8,7 @@ import components.Toast;
 import dao.StudentDAO;
 import dao.ClassesDAO;
 import dao.SubjectsDAO;
+import dao.TeacherDAO;
 import model.Student;
 import model.Classes;
 import model.Subject;
@@ -16,12 +17,15 @@ import java.util.List;
 import java.sql.Date;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import model.Teacher;
 import view.dialog.AddClassDialog;
 import view.dialog.AddSubjectDialog;
+import view.dialog.AddTeacherDialog;
 
 public class AdminPanel extends javax.swing.JPanel {
 
     private StudentDAO studentDAO;
+    private TeacherDAO teacherDAO;
     private ClassesDAO classesDAO;
     private SubjectsDAO subjectsDAO;
 
@@ -30,12 +34,21 @@ public class AdminPanel extends javax.swing.JPanel {
         studentDAO = new StudentDAO();
         classesDAO = new ClassesDAO();
         subjectsDAO = new SubjectsDAO();
+        teacherDAO = new TeacherDAO();
+        reloadDataAdmin();
+    }
+
+    public void reloadDataAdmin() {
         loadStudentData();
         loadClassesData();
         loadSubjectData();
+        loadTeacherData();
     }
 
     private void loadStudentData() {
+        DefaultTableModel model = (DefaultTableModel) tbListStudent.getModel();
+        model.setRowCount(0);
+
         tbListStudent.getColumnModel().getColumn(0).setPreferredWidth(50);
         tbListStudent.getColumnModel().getColumn(6).setPreferredWidth(100);
         tbListStudent.getColumnModel().getColumn(7).setPreferredWidth(150);
@@ -43,9 +56,6 @@ public class AdminPanel extends javax.swing.JPanel {
         List<Student> students = studentDAO.getAllStudents();
 
         System.out.println("students: " + students);
-
-        DefaultTableModel model = (DefaultTableModel) tbListStudent.getModel();
-        model.setRowCount(0);
 
         for (Student s : students) {
             model.addRow(new Object[]{
@@ -64,10 +74,10 @@ public class AdminPanel extends javax.swing.JPanel {
     }
 
     private void loadClassesData() {
-        List<Classes> classes = classesDAO.getAllClasses();
-
         DefaultTableModel model = (DefaultTableModel) tableListClass.getModel();
         model.setRowCount(0);
+
+        List<Classes> classes = classesDAO.getAllClasses();
 
         for (Classes s : classes) {
             model.addRow(new Object[]{
@@ -77,7 +87,7 @@ public class AdminPanel extends javax.swing.JPanel {
             });
         }
 
-        DeleteButtonColumn.addDeleteButton(tableListClass, 3, (row) -> {
+        DeleteButtonColumn.addDeleteButton("Xoá", "Bạn có chắc muốn xóa dòng này?", tableListClass, 3, (row) -> {
             if (tableListClass.isEditing()) {
                 tableListClass.getCellEditor().stopCellEditing();
             }
@@ -86,7 +96,7 @@ public class AdminPanel extends javax.swing.JPanel {
             boolean success = classesDAO.deleteClassById(studentId);
 
             if (success) {
-                refreshTableClasses();
+                reloadDataAdmin();
                 Toast.show("✅ Xóa lớp thành công!");
             } else {
                 Toast.show("❌ Xóa lớp thất bại!");
@@ -95,10 +105,10 @@ public class AdminPanel extends javax.swing.JPanel {
     }
 
     private void loadSubjectData() {
-        List<Subject> subject = subjectsDAO.getAllSubjects();
-
         DefaultTableModel model = (DefaultTableModel) tableListSubject.getModel();
         model.setRowCount(0);
+
+        List<Subject> subject = subjectsDAO.getAllSubjects();
 
         for (Subject s : subject) {
             model.addRow(new Object[]{
@@ -108,7 +118,7 @@ public class AdminPanel extends javax.swing.JPanel {
             });
         }
 
-        DeleteButtonColumn.addDeleteButton(tableListSubject, 3, (row) -> {
+        DeleteButtonColumn.addDeleteButton("Xoá", "Bạn có chắc muốn xóa dòng này?", tableListSubject, 3, (row) -> {
             if (tableListSubject.isEditing()) {
                 tableListSubject.getCellEditor().stopCellEditing();
             }
@@ -117,7 +127,7 @@ public class AdminPanel extends javax.swing.JPanel {
             boolean success = subjectsDAO.deleteSubject(id);
 
             if (success) {
-                refreshTableSubject();
+                reloadDataAdmin();
                 Toast.show("✅ Xóa môn học thành công!");
             } else {
                 Toast.show("❌ Xóa môn học thất bại!");
@@ -125,22 +135,38 @@ public class AdminPanel extends javax.swing.JPanel {
         });
     }
 
-    public void refreshTableStudent() {
-        DefaultTableModel model = (DefaultTableModel) tbListStudent.getModel();
+    private void loadTeacherData() {
+        DefaultTableModel model = (DefaultTableModel) tableListTeacher.getModel();
         model.setRowCount(0);
-        loadStudentData();
-    }
 
-    public void refreshTableClasses() {
-        DefaultTableModel model = (DefaultTableModel) tableListClass.getModel();
-        model.setRowCount(0);
-        loadClassesData();
-    }
+        List<Teacher> teachers = teacherDAO.getAllTeacher();
 
-    public void refreshTableSubject() {
-        DefaultTableModel model = (DefaultTableModel) tableListSubject.getModel();
-        model.setRowCount(0);
-        loadSubjectData();
+        for (Teacher s : teachers) {
+            model.addRow(new Object[]{
+                s.getId(),
+                s.getFullName(),
+                s.getBirthDay(),
+                s.getGender(),
+                s.getPhone(),
+                s.getAddress()
+            });
+        }
+
+        DeleteButtonColumn.addDeleteButton("Xoá", "Bạn có chắc muốn xóa dòng này?", tableListTeacher, 6, (row) -> {
+            if (tableListTeacher.isEditing()) {
+                tableListTeacher.getCellEditor().stopCellEditing();
+            }
+
+            int teacherId = (int) model.getValueAt(row, 0);
+            boolean success = teacherDAO.deleteTeacherByIdWidthTransaction(teacherId);
+
+            if (success) {
+                reloadDataAdmin();
+                Toast.show("✅ Xóa giáo viên thành công!");
+            } else {
+                Toast.show("❌ Xóa giáo viên thất bại!");
+            }
+        });
     }
 
     // Callback khi nhấn nút "Xóa"
@@ -154,11 +180,11 @@ public class AdminPanel extends javax.swing.JPanel {
             return;
         }
 
-        int studentId = (int) model.getValueAt(row, 0); 
+        int studentId = (int) model.getValueAt(row, 0);
 
         boolean success = studentDAO.deleteStudentById(studentId);
         if (success) {
-            refreshTableStudent();
+            reloadDataAdmin();
             Toast.show("✅ Xóa sinh viên thành công!");
         } else {
             Toast.show("❌ Xóa sinh viên thất bại!");
@@ -219,6 +245,10 @@ public class AdminPanel extends javax.swing.JPanel {
         btnCreateSubject = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         tableListSubject = new javax.swing.JTable();
+        jLabel3 = new javax.swing.JLabel();
+        btnCreateTeacher = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tableListTeacher = new javax.swing.JTable();
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
@@ -246,7 +276,7 @@ public class AdminPanel extends javax.swing.JPanel {
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane1.setPreferredSize(new java.awt.Dimension(1000, 500));
 
-        jPanel2.setPreferredSize(new java.awt.Dimension(1000, 700));
+        jPanel2.setPreferredSize(new java.awt.Dimension(1000, 1000));
 
         jLabel1.setText("Danh Sách Sinh Viên");
 
@@ -341,6 +371,28 @@ public class AdminPanel extends javax.swing.JPanel {
         });
         jScrollPane4.setViewportView(tableListSubject);
 
+        jLabel3.setText("Danh Sách Giáo Viên");
+
+        btnCreateTeacher.setText("Tạo");
+        btnCreateTeacher.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateTeacherActionPerformed(evt);
+            }
+        });
+
+        tableListTeacher.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Họ Tên", "Ngày Sinh", "Giới Tính", "Điện Thoại", "Địa Chỉ", "Action"
+            }
+        ));
+        jScrollPane5.setViewportView(tableListTeacher);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -354,10 +406,16 @@ public class AdminPanel extends javax.swing.JPanel {
                         .addComponent(btnCreateStudent)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane3)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnCreateTeacher)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel2Layout.createSequentialGroup()
                                         .addComponent(lbListSubject)
@@ -392,7 +450,13 @@ public class AdminPanel extends javax.swing.JPanel {
                     .addComponent(btnCreateSubject))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(56, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(btnCreateTeacher))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(59, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanel2);
@@ -574,23 +638,33 @@ public class AdminPanel extends javax.swing.JPanel {
         addDialog.setVisible(true);
     }//GEN-LAST:event_btnCreateSubjectActionPerformed
 
+    private void btnCreateTeacherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateTeacherActionPerformed
+        AddTeacherDialog addDialog = new AddTeacherDialog((JFrame) SwingUtilities.getWindowAncestor(this), true, this);
+        addDialog.setLocationRelativeTo(this);
+        addDialog.setVisible(true);
+    }//GEN-LAST:event_btnCreateTeacherActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCreateClasses;
     private javax.swing.JButton btnCreateStudent;
     private javax.swing.JButton btnCreateSubject;
+    private javax.swing.JButton btnCreateTeacher;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lbListSubject;
     private javax.swing.JTable tableListClass;
     private javax.swing.JTable tableListSubject;
+    private javax.swing.JTable tableListTeacher;
     private javax.swing.JTable tbListStudent;
     // End of variables declaration//GEN-END:variables
 }
