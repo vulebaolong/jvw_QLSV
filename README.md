@@ -94,7 +94,7 @@ java -jar target/QLSV-1.0-SNAPSHOT.jar
 ---
 ## 📬 Liên hệ
 - **Tác giả:** vulebaolong
-- **Email:** vulebaolong@example.com
+- **Email:** vulebaolong@gmail.com
 
 📢 **Ứng dụng đang trong quá trình phát triển!** 🚀
 
