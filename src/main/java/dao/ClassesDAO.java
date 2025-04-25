@@ -11,10 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class ClassesDAO {
 
     // Thêm lớp học vào database (không cần ID)

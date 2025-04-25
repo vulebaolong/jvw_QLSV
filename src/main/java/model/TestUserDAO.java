@@ -8,10 +8,7 @@ import dao.UserDAO;
 import model.User;
 import java.util.List;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TestUserDAO {
 
     public static void main(String[] args) {

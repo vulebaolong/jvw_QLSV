@@ -12,10 +12,7 @@ import javax.swing.JOptionPane;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class RegisterPanel extends javax.swing.JPanel {
 
     private MainFrame mainFrame;

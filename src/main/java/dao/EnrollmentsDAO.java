@@ -12,10 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Subject;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class EnrollmentsDAO {
 
     public List<Enrollment> getEnrolledSubjectsByStudentId(int studentId) {

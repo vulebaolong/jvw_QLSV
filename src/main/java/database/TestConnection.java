@@ -6,10 +6,7 @@ package database;
 
 import java.sql.Connection;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TestConnection {
     public static void main(String[] args) {
         Connection conn = DatabaseConnection.getConnection();

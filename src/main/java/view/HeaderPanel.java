@@ -10,10 +10,7 @@ import java.awt.*;
 import model.User;
 import session.UserSession;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class HeaderPanel extends javax.swing.JPanel {
 
     private MainFrame mainFrame;

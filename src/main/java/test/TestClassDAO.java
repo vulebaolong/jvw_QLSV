@@ -10,10 +10,7 @@ import model.Classes;
 import java.util.List;
 import java.util.Random;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TestClassDAO {
 
      private static  ClassesDAO classesDAO = new ClassesDAO();

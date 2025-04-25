@@ -9,10 +9,7 @@ import javax.swing.JOptionPane;
 import model.Classes;
 import dao.ClassesDAO;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 import view.AdminPanel;
 
 public class AddClassDialog extends javax.swing.JDialog {

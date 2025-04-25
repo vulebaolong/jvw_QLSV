@@ -16,10 +16,7 @@ import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 import view.AdminPanel;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class AddTeacherDialog extends javax.swing.JDialog {
 
     private TeacherDAO teacherDAO;

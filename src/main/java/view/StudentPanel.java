@@ -32,10 +32,7 @@ import view.dialog.ChangeClassDialog;
 import view.dialog.RegisterClassDialog;
 import view.dialog.RegisterStudentDialog;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class StudentPanel extends javax.swing.JPanel {
 
     private ClassesDAO classesDAO;

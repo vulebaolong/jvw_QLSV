@@ -11,10 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class SubjectsDAO {
 
     // Thêm môn học

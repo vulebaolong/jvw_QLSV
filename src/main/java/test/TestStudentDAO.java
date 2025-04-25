@@ -10,10 +10,7 @@ import model.Student;
 import java.sql.Date;
 import java.util.List;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TestStudentDAO {
 
     private static final StudentDAO studentDAO = new StudentDAO();

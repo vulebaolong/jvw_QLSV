@@ -8,10 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3307/db_QLSV";
     private static final String USER = "root";

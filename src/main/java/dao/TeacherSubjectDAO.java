@@ -15,10 +15,7 @@ import java.util.List;
 import model.Subject;
 import model.TeacherSubject;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TeacherSubjectDAO {
 
     public List<TeacherSubject> getClassesByTeacherId(int teacherId) {

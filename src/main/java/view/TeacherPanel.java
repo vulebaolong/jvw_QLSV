@@ -18,10 +18,7 @@ import model.TeacherSubject;
 import model.User;
 import session.UserSession;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TeacherPanel extends javax.swing.JPanel {
 
     private Teacher teacher;

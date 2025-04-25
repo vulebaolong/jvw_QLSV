@@ -13,10 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.EventObject;
 import java.util.function.Consumer;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class ActionButtonColumn extends AbstractCellEditor implements TableCellRenderer, TableCellEditor {
 
     private JPanel panel;

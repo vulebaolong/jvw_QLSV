@@ -11,10 +11,7 @@ import javax.swing.JOptionPane;
 import model.Student;
 import view.AdminPanel;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class AddStudentDialog extends javax.swing.JDialog {
 
     private StudentDAO studentDAO;

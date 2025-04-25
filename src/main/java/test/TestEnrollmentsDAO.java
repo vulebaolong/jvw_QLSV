@@ -8,10 +8,7 @@ import dao.EnrollmentsDAO;
 import model.Enrollment;
 import java.util.List;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TestEnrollmentsDAO {
 
     public static void main(String[] args) {

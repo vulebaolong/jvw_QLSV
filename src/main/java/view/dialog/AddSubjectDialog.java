@@ -10,10 +10,7 @@ import javax.swing.JOptionPane;
 import model.Subject;
 import view.AdminPanel;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class AddSubjectDialog extends javax.swing.JDialog {
 
     private SubjectsDAO subjectsDAO;

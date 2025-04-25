@@ -15,10 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import model.Classes;
 import model.Teacher;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class UserDAO {
 
     // Thêm người dùng mới

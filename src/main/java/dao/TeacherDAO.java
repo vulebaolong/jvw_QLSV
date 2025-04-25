@@ -14,10 +14,7 @@ import model.Classes;
 import model.Teacher;
 import model.User;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TeacherDAO {
     
     

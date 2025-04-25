@@ -6,10 +6,7 @@ package model;
 
 import java.sql.Timestamp;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TeacherSubject {
 
     private int id;

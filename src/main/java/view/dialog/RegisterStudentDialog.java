@@ -14,10 +14,7 @@ import session.UserSession;
 import view.AdminPanel;
 import view.StudentPanel;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class RegisterStudentDialog extends javax.swing.JDialog {
 
     private StudentDAO studentDAO;

@@ -10,10 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
 
     private JButton button;

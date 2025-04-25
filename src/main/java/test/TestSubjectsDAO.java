@@ -9,10 +9,7 @@ import model.Subject;
 
 import java.util.List;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class TestSubjectsDAO {
 
     public static void main(String[] args) {

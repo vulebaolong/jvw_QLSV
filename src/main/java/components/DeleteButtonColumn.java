@@ -7,10 +7,7 @@ package components;
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class DeleteButtonColumn {
     public static void addDeleteButton( String text, String textPopup ,JTable table, int columnIndex, ButtonEditor.DeleteAction deleteAction) {
         TableColumnModel columnModel = table.getColumnModel();

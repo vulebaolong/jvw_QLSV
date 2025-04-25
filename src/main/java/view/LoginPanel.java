@@ -12,10 +12,7 @@ import components.Toast;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class LoginPanel extends javax.swing.JPanel {
 
     private MainFrame mainFrame;

@@ -11,10 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import components.Toast;
 
-/**
- *
- * @author vulebaolong
- */
+ 
 public class MainFrame extends javax.swing.JFrame {
 
     private CardLayout clientCardLayout;
