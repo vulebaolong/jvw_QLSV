@@ -1,10 +1,10 @@
 # 📚 Quản Lý Sinh Viên (QLSV)
 
 ## 🚀 Danh sacá nhóm
-Võ Duy Quan - 23210269
-Vũ Lê Bảo Long - 23210243
-Giang Ngọc Thanh - 23210275
-Ngô Ngọc Minh - 23210246
+- Võ Duy Quan - 23210269
+- Vũ Lê Bảo Long - 23210243
+- Giang Ngọc Thanh - 23210275
+- Ngô Ngọc Minh - 23210246
 
 ## 🚀 Giới thiệu
 Ứng dụng **Quản Lý Sinh Viên (QLSV)** là phần mềm desktop được xây dựng bằng **Java Swing** và **MySQL** để hỗ trợ quản lý sinh viên, giáo viên, lớp học, môn học và điểm số.
