@@ -1,6 +1,6 @@
 # 📚 Quản Lý Sinh Viên (QLSV)
 
-## 🚀 Danh sacá nhóm
+## 🚀 Danh sách nhóm
 - Võ Duy Quan - 23210269
 - Vũ Lê Bảo Long - 23210243
 - Giang Ngọc Thanh - 23210275
